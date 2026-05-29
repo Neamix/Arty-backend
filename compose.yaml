@@ -1,0 +1,45 @@
+name: artmes
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8080
+    volumes:
+      -  ./:/var/www/html
+      - artmes_storage_volume:/var/www/html/storage
+      - artmes_vendor_volume:/var/www/html/vendor
+    env_file:
+      - .env
+    restart: always
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: artmes
+    volumes:
+      - artmes_mysql_volume:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 9000:80
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    depends_on: 
+      - mysql
+      - api
+volumes:
+  artmes_storage_volume:
+  artmes_vendor_volume:
+  artmes_mysql_volume:  

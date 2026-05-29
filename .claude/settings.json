@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(php artisan --version)",
+      "PowerShell(composer require laravel/passport laravel/socialite --no-interaction 2>&1)",
+      "PowerShell(php artisan vendor:publish --tag=modules-config --force --no-interaction 2>&1)",
+      "PowerShell(php artisan passport:install --no-interaction 2>&1)"
+    ]
+  }
+}
