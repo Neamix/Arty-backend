@@ -4,7 +4,11 @@
       "PowerShell(php artisan --version)",
       "PowerShell(composer require laravel/passport laravel/socialite --no-interaction 2>&1)",
       "PowerShell(php artisan vendor:publish --tag=modules-config --force --no-interaction 2>&1)",
-      "PowerShell(php artisan passport:install --no-interaction 2>&1)"
+      "PowerShell(php artisan passport:install --no-interaction 2>&1)",
+      "Read(//b/var/www/html/Modules/UserManagement/**)",
+      "Read(//b/var/**)",
+      "PowerShell(composer dump-autoload --no-interaction 2>&1)",
+      "WebFetch(domain:scramble.dedoc.co)"
     ]
   }
 }

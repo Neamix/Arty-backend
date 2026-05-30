@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: artmes-api-image
     ports:
       - 8081:8080
     volumes:
@@ -15,7 +16,16 @@ services:
     restart: always
     depends_on:
       - mysql
-
+  nightwatch:
+    image: artmes-api-image
+    restart: always
+    command: ["php", "artisan","nightwatch:agent"]
+    env_file:
+      - .env
+    volumes:
+      -  ./:/var/www/html
+      - artmes_storage_volume:/var/www/html/storage
+      - artmes_vendor_volume:/var/www/html/vendor
   mysql:
     image: mysql:8.0
     restart: always
