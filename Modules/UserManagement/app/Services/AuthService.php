@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\UserManagement\Enums\OtpUsage;
 use Modules\UserManagement\Exceptions\AuthException;
+use Modules\UserManagement\Exceptions\OtpException;
 use Modules\UserManagement\Repositories\UserRepository;
 
 class AuthService
@@ -17,13 +18,20 @@ class AuthService
         private OtpService $otpService,
     ) {}
 
-    /**
-     * @param  array{name: string, email: string, password: string, workspace_name?: ?string}  $data
-     * @return array{user: User, token: string}
-     */
     public function register(array $data): array
     {
-        $user = DB::transaction(function () use ($data) {
+        $user = $this->saveNewUser($data);
+        $this->otpService->sendOtp($user->email, OtpUsage::EmailVerification);
+
+        return [
+            'user' => $user->refresh()->load('workspaces'),
+            'token' => $this->issueToken($user),
+        ];
+    }
+
+    public function saveNewUser(array $data): User
+    {
+        return DB::transaction(function () use ($data) {
             $user = $this->userRepository->create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -34,17 +42,47 @@ class AuthService
 
             return $user;
         });
-
-        return [
-            'user' => $user->refresh()->load('workspaces'),
-            'token' => $this->issueToken($user),
-        ];
     }
 
     /**
-     * @param  array{email: string, password: string}  $data
-     * @return array{user: User, token: string}
-     *
+     * @throws OtpException
+     * @throws AuthException
+     */
+    public function verifyEmail(string $email, string $code): User
+    {
+        $this->otpService->verify($email, $code, OtpUsage::EmailVerification);
+
+        $user = $this->userRepository->findByEmail($email);
+
+        if (! $user) {
+            throw new AuthException('User not found.', 404);
+        }
+
+        $this->userRepository->markEmailVerified($user);
+        $this->otpService->consume($email, OtpUsage::EmailVerification);
+
+        return $user->refresh();
+    }
+
+    /**
+     * @throws AuthException
+     */
+    public function resendEmailVerification(string $email): void
+    {
+        $user = $this->userRepository->findByEmail($email);
+
+        if (! $user) {
+            throw new AuthException('User not found.', 404);
+        }
+
+        if ($user->email_verified_at) {
+            throw new AuthException('Email already verified.', 422);
+        }
+
+        $this->otpService->sendOtp($email, OtpUsage::EmailVerification);
+    }
+
+    /**
      * @throws AuthException
      */
     public function login(array $data): array
@@ -68,8 +106,6 @@ class AuthService
     }
 
     /**
-     * @param  array{email: string, password: string}  $data
-     *
      * @throws AuthException
      */
     public function resetPassword(array $data): User

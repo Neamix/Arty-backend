@@ -4,7 +4,6 @@ namespace Modules\UserManagement\Services;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\RateLimiter;
 use Modules\UserManagement\Enums\OtpUsage;
 use Modules\UserManagement\Exceptions\OtpException;
 use Modules\UserManagement\Mail\OtpMail;
@@ -20,11 +19,9 @@ class OtpService
      */
     public function sendOtp(string $email, OtpUsage $usage): Otp
     {
-        $this->ensureNotRateLimited($email, $usage);
-
         $this->otpRepository->deleteUnverifiedFor($email, $usage);
 
-        $code = $this->generateCode();
+        $code = rand(111111, 999999);
         $expiresInMinutes = Otp::$expireTime;
 
         $otp = $this->otpRepository->create([
@@ -35,8 +32,6 @@ class OtpService
         ]);
 
         Mail::to($email)->send(new OtpMail($code, $usage, $expiresInMinutes));
-
-        RateLimiter::hit($this->rateLimiterKey($email, $usage), (int) config('usermanagement.otp.rate_limit.decay_minutes', 15) * 60);
 
         return $otp;
     }
@@ -86,7 +81,7 @@ class OtpService
             throw new OtpException('Verification required before this action.');
         }
 
-        $windowMinutes = (int) config('usermanagement.otp.reset_window_minutes', 15);
+        $windowMinutes = Otp::$expireTime;
         if ($otp->verified_at->lt(Carbon::now()->subMinutes($windowMinutes))) {
             throw new OtpException('Verification expired. Start the flow again.');
         }
@@ -97,30 +92,5 @@ class OtpService
     public function consume(string $email, OtpUsage $usage): void
     {
         $this->otpRepository->deleteFor($email, $usage);
-    }
-
-    private function generateCode(): string
-    {
-        $length = (int) config('usermanagement.otp.length', 6);
-        $max = (int) str_repeat('9', $length);
-        $min = (int) ('1'.str_repeat('0', $length - 1));
-
-        return (string) random_int($min, $max);
-    }
-
-    private function ensureNotRateLimited(string $email, OtpUsage $usage): void
-    {
-        $key = $this->rateLimiterKey($email, $usage);
-        $max = (int) config('usermanagement.otp.rate_limit.max_requests', 5);
-
-        if (RateLimiter::tooManyAttempts($key, $max)) {
-            $seconds = RateLimiter::availableIn($key);
-            throw new OtpException("Too many requests. Try again in {$seconds} seconds.", 429);
-        }
-    }
-
-    private function rateLimiterKey(string $email, OtpUsage $usage): string
-    {
-        return 'otp:'.$usage->value.':'.sha1(strtolower($email));
     }
 }

@@ -26,6 +26,20 @@ services:
       -  ./:/var/www/html
       - artmes_storage_volume:/var/www/html/storage
       - artmes_vendor_volume:/var/www/html/vendor
+  queue:
+    image: artmes-api-image
+    entrypoint: []
+    command: ["php", "artisan", "queue:work", "--sleep=1", "--tries=3", "--max-time=3600"]
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    volumes:
+      -  ./:/var/www/html
+      - artmes_storage_volume:/var/www/html/storage
+      - artmes_vendor_volume:/var/www/html/vendor
+      
   mysql:
     image: mysql:8.0
     restart: always

@@ -8,7 +8,8 @@
       "Read(//b/var/www/html/Modules/UserManagement/**)",
       "Read(//b/var/**)",
       "PowerShell(composer dump-autoload --no-interaction 2>&1)",
-      "WebFetch(domain:scramble.dedoc.co)"
+      "WebFetch(domain:scramble.dedoc.co)",
+      "PowerShell(docker exec artmes-mysql-1 mysql -u root -ppassword artmes -e \"DESCRIBE otps;\" 2>&1)"
     ]
   }
 }

@@ -23,6 +23,11 @@ class UserRepository
         return $this->user->newQuery()->create($attributes);
     }
 
+    public function markEmailVerified(User $user): bool
+    {
+        return $user->forceFill(['email_verified_at' => now()])->save();
+    }
+
     public function updatePassword(User $user, string $hashedPassword): bool
     {
         return $user->forceFill(['password' => $hashedPassword])->save();

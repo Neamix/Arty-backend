@@ -22,7 +22,6 @@ class AuthController extends Controller
             'message' => 'Registration successful.',
             'user' => new UserResource($result['user']),
             'token' => $result['token'],
-            'token_type' => 'Bearer',
         ], 201);
     }
 
