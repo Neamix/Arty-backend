@@ -8,7 +8,7 @@ use Modules\UserManagement\Http\Controllers\GoogleAuthController;
 
 Route::prefix('v1/auth')->name('auth.')->group(function () {
     Route::post('register', [AuthController::class, 'register'])
-=        ->name('register');
+        ->name('register');
 
     Route::post('login', [AuthController::class, 'login'])
         ->middleware('throttle:10,1')
@@ -16,12 +16,15 @@ Route::prefix('v1/auth')->name('auth.')->group(function () {
 
     Route::prefix('password')->name('password.')->group(function () {
         Route::post('forgot', [ForgotPasswordController::class, 'sendOtp'])
+            ->middleware('throttle:10,1')
             ->name('forgot');
 
         Route::post('verify', [ForgotPasswordController::class, 'verifyOtp'])
+            ->middleware('throttle:10,1')
             ->name('verify');
 
         Route::post('reset', [ForgotPasswordController::class, 'resetPassword'])
+            ->middleware('throttle:10,1')
             ->name('reset');
     });
 

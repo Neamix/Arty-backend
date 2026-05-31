@@ -9,7 +9,10 @@
       "Read(//b/var/**)",
       "PowerShell(composer dump-autoload --no-interaction 2>&1)",
       "WebFetch(domain:scramble.dedoc.co)",
-      "PowerShell(docker exec artmes-mysql-1 mysql -u root -ppassword artmes -e \"DESCRIBE otps;\" 2>&1)"
+      "PowerShell(docker exec artmes-mysql-1 mysql -u root -ppassword artmes -e \"DESCRIBE otps;\" 2>&1)",
+      "Read(//b/MyProjects/Artmes/Modules/UserManagement/app/**)",
+      "PowerShell(php artisan test Modules/ProjectManagement/tests/Feature/ProjectKanbanTest.php --filter \"exposes the card title\" 2>&1)",
+      "PowerShell(\"=== lead_debug.json ===\")"
     ]
   }
 }
