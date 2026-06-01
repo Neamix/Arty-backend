@@ -3,30 +3,25 @@ set -euo pipefail
 
 cd /var/www/html
 
-if [ ! -f .env ] && [ -f .env.example ]; then
-    cp .env.example .env
-fi
 
-if [ -z "${APP_KEY:-}" ] && ! grep -q '^APP_KEY=base64:' .env 2>/dev/null; then
-    php artisan key:generate --force --no-interaction || true
-fi
-
-mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 chown -R www:www storage bootstrap/cache || true
 
-php artisan optimize:clear --no-interaction || true
+composer dump-autoload --optimize --no-dev --classmap-authoritative --no-scripts
+composer dump-autoload --optimize --no-dev
+
+php artisan optimize:clear --no-interaction
 
 php artisan config:cache  --no-interaction
 php artisan route:cache   --no-interaction
-php artisan view:cache    --no-interaction
+php artisan view:cache    --no-interaction || true
 php artisan event:cache   --no-interaction || true
+php artisan passport:keys --force --no-interaction || true
+php artisan passport:client --personal --no-interaction || true
+php artisan migrate --force --no-interaction
+php artisan storage:link --no-interaction || true
 
-if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
-    php artisan migrate --force --no-interaction
-fi
-
-if [ "${RUN_STORAGE_LINK:-true}" = "true" ]; then
-    php artisan storage:link --no-interaction || true
-fi
+chmod 600 /var/www/html/storage/oauth-private.key 2>/dev/null || true
+chmod 600 /var/www/html/storage/oauth-public.key 2>/dev/null || true
 
 exec "$@"
+

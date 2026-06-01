@@ -13,9 +13,6 @@ class StoreLeadRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function rules(): array
     {
         return [
@@ -25,14 +22,10 @@ class StoreLeadRequest extends FormRequest
         ];
     }
 
-    /**
-     * Validate that submitted field ids belong to the project and that required
-     * fields are present, mirroring the dynamic form definition.
-     */
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            /** @var Project|null $project */
+
             $project = $this->route('project');
 
             if (! $project instanceof Project) {

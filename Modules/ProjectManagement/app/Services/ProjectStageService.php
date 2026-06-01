@@ -11,9 +11,6 @@ class ProjectStageService
 {
     public function __construct(private ProjectStageRepository $stageRepository) {}
 
-    /**
-     * @param  array{name: string, sort_order?: int}  $data
-     */
     public function create(Project $project, array $data): ProjectStage
     {
         $sortOrder = $data['sort_order']
@@ -25,9 +22,6 @@ class ProjectStageService
         ]);
     }
 
-    /**
-     * @param  array{name?: string, sort_order?: int}  $data
-     */
     public function update(ProjectStage $stage, array $data): ProjectStage
     {
         return $this->stageRepository->update($stage, $data);
@@ -38,11 +32,6 @@ class ProjectStageService
         $this->stageRepository->delete($stage);
     }
 
-    /**
-     * Persist a new ordering for the project's stages.
-     *
-     * @param  array<int, int>  $orderedStageIds  Stage IDs in the desired order.
-     */
     public function reorder(Project $project, array $orderedStageIds): void
     {
         DB::transaction(function () use ($project, $orderedStageIds): void {

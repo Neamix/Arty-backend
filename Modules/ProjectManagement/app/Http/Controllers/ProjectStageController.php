@@ -8,14 +8,19 @@ use Illuminate\Http\Request;
 use Modules\ProjectManagement\Http\Requests\ReorderStagesRequest;
 use Modules\ProjectManagement\Http\Requests\StoreStageRequest;
 use Modules\ProjectManagement\Http\Requests\UpdateStageRequest;
+use Modules\ProjectManagement\Http\Resources\ProjectLeadResource;
 use Modules\ProjectManagement\Http\Resources\ProjectStageResource;
 use Modules\ProjectManagement\Models\Project;
 use Modules\ProjectManagement\Models\ProjectStage;
+use Modules\ProjectManagement\Services\ProjectLeadService;
 use Modules\ProjectManagement\Services\ProjectStageService;
 
 class ProjectStageController extends Controller
 {
-    public function __construct(private ProjectStageService $stageService) {}
+    public function __construct(
+        private ProjectStageService $stageService,
+        private ProjectLeadService $leadService,
+    ) {}
 
     public function store(StoreStageRequest $request, Project $project): JsonResponse
     {
@@ -61,6 +66,15 @@ class ProjectStageController extends Controller
         return response()->json([
             'message' => 'Stages reordered successfully.',
         ]);
+    }
+
+    public function leads(Request $request, Project $project, ProjectStage $stage): JsonResponse
+    {
+        $this->authorizeProject($request, $project);
+
+        $leads = $this->leadService->leadsForStage($project, $stage);
+
+        return ProjectLeadResource::collection($leads)->response();
     }
 
     private function authorizeProject(Request $request, Project $project): void

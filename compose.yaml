@@ -8,24 +8,35 @@ services:
     ports:
       - 8081:8080
     volumes:
-      -  ./:/var/www/html
+      - ./:/var/www/html
       - artmes_storage_volume:/var/www/html/storage
       - artmes_vendor_volume:/var/www/html/vendor
     env_file:
       - .env
+    environment:
+      RUN_MIGRATIONS: "true"
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+
   nightwatch:
     image: artmes-api-image
     restart: always
-    command: ["php", "artisan","nightwatch:agent"]
+    entrypoint: []
+    command: ["php", "artisan", "nightwatch:agent"]
     env_file:
       - .env
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      disable: true
     volumes:
-      -  ./:/var/www/html
+      - ./:/var/www/html
       - artmes_storage_volume:/var/www/html/storage
       - artmes_vendor_volume:/var/www/html/vendor
+
   queue:
     image: artmes-api-image
     entrypoint: []
@@ -34,12 +45,15 @@ services:
     env_file:
       - .env
     depends_on:
-      - mysql
+      api:
+        condition: service_healthy
+    healthcheck:
+      disable: true
     volumes:
-      -  ./:/var/www/html
+      - ./:/var/www/html
       - artmes_storage_volume:/var/www/html/storage
       - artmes_vendor_volume:/var/www/html/vendor
-      
+
   mysql:
     image: mysql:8.0
     restart: always
@@ -50,6 +64,13 @@ services:
       MYSQL_DATABASE: artmes
     volumes:
       - artmes_mysql_volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   phpmyadmin:
     image: phpmyadmin
     restart: always
@@ -60,10 +81,11 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
       PMA_ARBITRARY: 1
-    depends_on: 
-      - mysql
-      - api
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 volumes:
   artmes_storage_volume:
   artmes_vendor_volume:
-  artmes_mysql_volume:  
+  artmes_mysql_volume:

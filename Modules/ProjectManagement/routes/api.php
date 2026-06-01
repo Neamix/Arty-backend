@@ -16,6 +16,7 @@ Route::middleware('auth:api')->prefix('v1')->name('projects.')->group(function (
         Route::prefix('projects/{project}/stages')->name('stages.')->group(function () {
             Route::post('/', [ProjectStageController::class, 'store'])->name('store');
             Route::post('reorder', [ProjectStageController::class, 'reorder'])->name('reorder');
+            Route::get('{stage}/leads', [ProjectStageController::class, 'leads'])->name('leads');
             Route::put('{stage}', [ProjectStageController::class, 'update'])->name('update');
             Route::delete('{stage}', [ProjectStageController::class, 'destroy'])->name('destroy');
         });

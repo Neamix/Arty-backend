@@ -1,0 +1,514 @@
+{
+  "info": {
+    "name": "Artmes",
+    "_postman_id": "artmes-api",
+    "description": "Artmes — Auth + Project Management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "token", "value": "YOUR_BEARER_TOKEN" },
+    { "key": "project_id", "value": "1" },
+    { "key": "stage_id", "value": "1" },
+    { "key": "lead_id", "value": "1" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "John Doe", "type": "text" },
+                { "key": "email", "value": "john@example.com", "type": "text" },
+                { "key": "password", "value": "Password1", "type": "text" },
+                { "key": "password_confirmation", "value": "Password1", "type": "text" },
+                { "key": "workspace_name", "value": "Acme Corp", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "email", "value": "john@example.com", "type": "text" },
+                { "key": "password", "value": "Password1", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Password",
+          "item": [
+            {
+              "name": "Forgot Password (Send OTP)",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "email", "value": "john@example.com", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/password/forgot",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "password", "forgot"]
+                }
+              }
+            },
+            {
+              "name": "Verify OTP",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "email", "value": "john@example.com", "type": "text" },
+                    { "key": "otp", "value": "123456", "type": "text" },
+                    { "key": "usage", "value": "password_reset", "description": "password_reset | email_verification | login_verification", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/password/verify",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "password", "verify"]
+                }
+              }
+            },
+            {
+              "name": "Reset Password",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "email", "value": "john@example.com", "type": "text" },
+                    { "key": "password", "value": "NewPassword1", "type": "text" },
+                    { "key": "password_confirmation", "value": "NewPassword1", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/password/reset",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "password", "reset"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Email Verification",
+          "item": [
+            {
+              "name": "Verify Email",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "otp", "value": "123456", "type": "text" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/email/verify",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "email", "verify"]
+                }
+              }
+            },
+            {
+              "name": "Resend Verification",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Accept", "value": "application/json" }],
+                "url": {
+                  "raw": "{{base_url}}/auth/email/resend",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "email", "resend"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Google OAuth",
+          "item": [
+            {
+              "name": "Redirect to Google",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/auth/google/redirect",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "google", "redirect"]
+                }
+              }
+            },
+            {
+              "name": "Google Callback",
+              "request": {
+                "auth": { "type": "noauth" },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/auth/google/callback",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "google", "callback"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["projects"]
+            }
+          }
+        },
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Sales Pipeline", "type": "text" },
+                { "key": "icon", "value": "briefcase", "type": "text" },
+
+                { "key": "form_fields[0][label]", "value": "Full Name", "type": "text" },
+                { "key": "form_fields[0][type]", "value": "text", "type": "text" },
+                { "key": "form_fields[0][required]", "value": "1", "type": "text" },
+                { "key": "form_fields[0][sort_order]", "value": "1", "type": "text" },
+
+                { "key": "form_fields[1][label]", "value": "Email", "type": "text" },
+                { "key": "form_fields[1][type]", "value": "email", "type": "text" },
+                { "key": "form_fields[1][required]", "value": "1", "type": "text" },
+                { "key": "form_fields[1][sort_order]", "value": "2", "type": "text" },
+
+                { "key": "form_fields[2][label]", "value": "Lead Source", "type": "text" },
+                { "key": "form_fields[2][type]", "value": "select", "description": "text|textarea|number|email|phone|url|date|time|datetime|select|radio|checkbox|country|state|city|map_location", "type": "text" },
+                { "key": "form_fields[2][required]", "value": "0", "type": "text" },
+                { "key": "form_fields[2][sort_order]", "value": "3", "type": "text" },
+                { "key": "form_fields[2][options][0]", "value": "Website", "type": "text" },
+                { "key": "form_fields[2][options][1]", "value": "Referral", "type": "text" },
+                { "key": "form_fields[2][options][2]", "value": "Cold Call", "type": "text" },
+
+                { "key": "card_title_field_index", "value": "0", "type": "text" },
+
+                { "key": "stages[0][name]", "value": "New", "type": "text" },
+                { "key": "stages[0][sort_order]", "value": "1", "type": "text" },
+                { "key": "stages[1][name]", "value": "Contacted", "type": "text" },
+                { "key": "stages[1][sort_order]", "value": "2", "type": "text" },
+                { "key": "stages[2][name]", "value": "Qualified", "type": "text" },
+                { "key": "stages[2][sort_order]", "value": "3", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects",
+              "host": ["{{base_url}}"],
+              "path": ["projects"]
+            }
+          }
+        },
+        {
+          "name": "Get Project",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Sales Pipeline (Updated)", "type": "text" },
+                { "key": "icon", "value": "chart-bar", "type": "text" },
+                { "key": "card_title_field_id", "value": "1", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stages",
+      "item": [
+        {
+          "name": "Create Stage",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Proposal Sent", "type": "text" },
+                { "key": "sort_order", "value": "4", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/stages",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "stages"]
+            }
+          }
+        },
+        {
+          "name": "Reorder Stages",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "stage_ids[0]", "value": "3", "type": "text" },
+                { "key": "stage_ids[1]", "value": "1", "type": "text" },
+                { "key": "stage_ids[2]", "value": "2", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/stages/reorder",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "stages", "reorder"]
+            }
+          }
+        },
+        {
+          "name": "Get Stage Leads",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/stages/{{stage_id}}/leads",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "stages", "{{stage_id}}", "leads"]
+            }
+          }
+        },
+        {
+          "name": "Update Stage",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Negotiation", "type": "text" },
+                { "key": "sort_order", "value": "4", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/stages/{{stage_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "stages", "{{stage_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Stage",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/stages/{{stage_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "stages", "{{stage_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leads",
+      "item": [
+        {
+          "name": "Create Lead",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "values[0][field_id]", "value": "1", "type": "text" },
+                { "key": "values[0][value]", "value": "John Doe", "type": "text" },
+                { "key": "values[1][field_id]", "value": "2", "type": "text" },
+                { "key": "values[1][value]", "value": "john@example.com", "type": "text" },
+                { "key": "values[2][field_id]", "value": "3", "type": "text" },
+                { "key": "values[2][value]", "value": "Website", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/leads",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "leads"]
+            }
+          }
+        },
+        {
+          "name": "Update Lead",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "values[0][field_id]", "value": "1", "type": "text" },
+                { "key": "values[0][value]", "value": "Jane Doe", "type": "text" },
+                { "key": "values[1][field_id]", "value": "2", "type": "text" },
+                { "key": "values[1][value]", "value": "jane@example.com", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "leads", "{{lead_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Lead",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "leads", "{{lead_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Move Lead",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "project_stage_id", "value": "2", "type": "text" },
+                { "key": "before_lead_id", "value": "", "type": "text", "description": "ID of the card immediately above the drop position (null = top of stage)" },
+                { "key": "after_lead_id", "value": "", "type": "text", "description": "ID of the card immediately below the drop position (null = bottom of stage)" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/leads/{{lead_id}}/move",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "leads", "{{lead_id}}", "move"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

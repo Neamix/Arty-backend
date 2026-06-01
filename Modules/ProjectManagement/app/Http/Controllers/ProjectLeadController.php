@@ -57,7 +57,12 @@ class ProjectLeadController extends Controller
         $this->authorizeProject($request, $project);
 
         $data = $request->validated();
-        $lead = $this->leadService->move($project, $lead, $data['project_stage_id'], $data['sort_order']);
+        $lead = $this->leadService->move(
+            $lead,
+            $data['project_stage_id'],
+            $data['before_lead_id'] ?? null,
+            $data['after_lead_id'] ?? null,
+        );
 
         return response()->json([
             'message' => 'Lead moved successfully.',

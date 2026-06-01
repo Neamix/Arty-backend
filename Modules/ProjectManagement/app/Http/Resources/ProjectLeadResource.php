@@ -7,9 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProjectLeadResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
@@ -24,9 +21,6 @@ class ProjectLeadResource extends JsonResource
         ];
     }
 
-    /**
-     * Resolve the Kanban card title from the project's card title field.
-     */
     private function resolveTitle(): ?string
     {
         $titleFieldId = $this->resource->getAttribute('card_title_field_id');

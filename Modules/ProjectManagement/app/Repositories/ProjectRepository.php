@@ -9,9 +9,6 @@ class ProjectRepository
 {
     public function __construct(private Project $project) {}
 
-    /**
-     * @return Collection<int, Project>
-     */
     public function forUser(int $userId): Collection
     {
         return $this->project->newQuery()
@@ -21,17 +18,11 @@ class ProjectRepository
             ->get();
     }
 
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
     public function create(array $attributes): Project
     {
         return $this->project->newQuery()->create($attributes);
     }
 
-    /**
-     * @param  array<string, mixed>  $attributes
-     */
     public function update(Project $project, array $attributes): Project
     {
         $project->update($attributes);
@@ -44,11 +35,13 @@ class ProjectRepository
         $project->delete();
     }
 
-    public function loadBoard(Project $project): Project
+    public function loadBoard(Project $project, int $leadsPerStage = 30): Project
     {
         return $project->load([
             'formFields',
             'cardTitleField',
+            'stages' => fn ($query) => $query->withCount('leads'),
+            'stages.leads' => fn ($query) => $query->orderBy('sort_order')->limit($leadsPerStage),
             'stages.leads.values',
         ]);
     }

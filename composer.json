@@ -36,7 +36,10 @@
             "Database\\Seeders\\": "database/seeders/",
             "Modules\\UserManagement\\": "Modules/UserManagement/app/",
             "Modules\\UserManagement\\Database\\Factories\\": "Modules/UserManagement/database/factories/",
-            "Modules\\UserManagement\\Database\\Seeders\\": "Modules/UserManagement/database/seeders/"
+            "Modules\\UserManagement\\Database\\Seeders\\": "Modules/UserManagement/database/seeders/",
+            "Modules\\ProjectManagement\\": "Modules/ProjectManagement/app/",
+            "Modules\\ProjectManagement\\Database\\Factories\\": "Modules/ProjectManagement/database/factories/",
+            "Modules\\ProjectManagement\\Database\\Seeders\\": "Modules/ProjectManagement/database/seeders/"
         }
     },
     "autoload-dev": {

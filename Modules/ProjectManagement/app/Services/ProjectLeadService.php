@@ -3,25 +3,25 @@
 namespace Modules\ProjectManagement\Services;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\DB;
-use Modules\ProjectManagement\Exceptions\ProjectException;
 use Modules\ProjectManagement\Models\Project;
 use Modules\ProjectManagement\Models\ProjectLead;
+use Modules\ProjectManagement\Models\ProjectStage;
 use Modules\ProjectManagement\Repositories\ProjectLeadRepository;
 use Modules\ProjectManagement\Repositories\ProjectStageRepository;
 
 class ProjectLeadService
 {
+    public const SORT_GAP = 100000;
+
+    public const SORT_MIN_GAP = 10000;
+
     public function __construct(
         private ProjectLeadRepository $leadRepository,
         private ProjectStageRepository $stageRepository,
     ) {}
 
-    /**
-     * Create a lead from the project's dynamic form values.
-     *
-     * @param  array{values: array<int, array{field_id: int, value: mixed}>}  $data
-     */
     public function create(Project $project, User $user, array $data): ProjectLead
     {
         return DB::transaction(function () use ($project, $user, $data) {
@@ -33,19 +33,16 @@ class ProjectLeadService
                 'sort_order' => $this->leadRepository->nextSortOrder($stage->id),
             ]);
 
-            $this->syncValues($lead, $data['values']);
+            $this->leadRepository->syncValues($lead, $data['values']);
 
             return $lead->load('values');
         });
     }
 
-    /**
-     * @param  array{values: array<int, array{field_id: int, value: mixed}>}  $data
-     */
     public function update(ProjectLead $lead, array $data): ProjectLead
     {
         return DB::transaction(function () use ($lead, $data) {
-            $this->syncValues($lead, $data['values']);
+            $this->leadRepository->syncValues($lead, $data['values']);
 
             return $lead->load('values');
         });
@@ -56,35 +53,61 @@ class ProjectLeadService
         $this->leadRepository->delete($lead);
     }
 
-    /**
-     * Move a lead to another stage and/or reorder it within a stage.
-     */
-    public function move(Project $project, ProjectLead $lead, int $stageId, int $sortOrder): ProjectLead
+    public function leadsForStage(Project $project, ProjectStage $stage, int $perPage = 30): CursorPaginator
     {
-        if (! $this->stageRepository->belongsToProject($project->id, $stageId)) {
-            throw ProjectException::stageNotInProject();
-        }
+        $leads = $this->leadRepository->paginateForStage($stage->id, $perPage);
 
-        return $this->leadRepository->update($lead, [
-            'project_stage_id' => $stageId,
-            'sort_order' => $sortOrder,
-        ]);
+        $leads->getCollection()->each(
+            fn (ProjectLead $lead) => $lead->setAttribute('card_title_field_id', $project->card_title_field_id),
+        );
+
+        return $leads;
     }
 
-    /**
-     * @param  array<int, array{field_id: int, value: mixed}>  $values
-     */
-    private function syncValues(ProjectLead $lead, array $values): void
+    public function move(ProjectLead $lead, int $stageId, ?int $beforeLeadId, ?int $afterLeadId): ProjectLead
     {
-        foreach ($values as $value) {
-            $this->leadRepository->syncValue($lead, $value['field_id'], $value['value']);
-        }
+        return DB::transaction(function () use ($lead, $stageId, $beforeLeadId, $afterLeadId) {
+            $sortOrder = $this->resolveSortOrder($stageId, $beforeLeadId, $afterLeadId);
+
+            return $this->leadRepository->update($lead, [
+                'project_stage_id' => $stageId,
+                'sort_order' => $sortOrder,
+            ]);
+        });
     }
 
-    /**
-     * Return the first stage by sort order, creating a default "Backlog" when none exist.
-     */
-    private function resolveDefaultStage(Project $project): \Modules\ProjectManagement\Models\ProjectStage
+    private function resolveSortOrder(int $stageId, ?int $beforeLeadId, ?int $afterLeadId): int
+    {
+        $before = $this->leadRepository->sortOrderOf($stageId, $beforeLeadId);
+        $after = $this->leadRepository->sortOrderOf($stageId, $afterLeadId);
+
+        if ($before === null && $after === null) {
+            return self::SORT_GAP;
+        }
+
+        if ($before === null) {
+            if ($after <= self::SORT_MIN_GAP) {
+                $this->leadRepository->rebalanceStage($stageId);
+                $after = $this->leadRepository->sortOrderOf($stageId, $afterLeadId);
+            }
+
+            return intdiv($after, 2);
+        }
+
+        if ($after === null) {
+            return $before + self::SORT_GAP;
+        }
+
+        if ($after - $before <= self::SORT_MIN_GAP) {
+            $this->leadRepository->rebalanceStage($stageId);
+            $before = $this->leadRepository->sortOrderOf($stageId, $beforeLeadId);
+            $after = $this->leadRepository->sortOrderOf($stageId, $afterLeadId);
+        }
+
+        return intdiv($before + $after, 2);
+    }
+
+    private function resolveDefaultStage(Project $project): ProjectStage
     {
         $stage = $this->stageRepository->firstBySortOrder($project->id);
 
