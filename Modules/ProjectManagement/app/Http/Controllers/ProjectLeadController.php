@@ -5,6 +5,7 @@ namespace Modules\ProjectManagement\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\ProjectManagement\Http\Requests\FilterLeadRequest;
 use Modules\ProjectManagement\Http\Requests\MoveLeadRequest;
 use Modules\ProjectManagement\Http\Requests\StoreLeadRequest;
 use Modules\ProjectManagement\Http\Requests\UpdateLeadRequest;
@@ -16,6 +17,15 @@ use Modules\ProjectManagement\Services\ProjectLeadService;
 class ProjectLeadController extends Controller
 {
     public function __construct(private ProjectLeadService $leadService) {}
+
+    public function index(FilterLeadRequest $request, Project $project): JsonResponse
+    {
+        $this->authorizeProject($request, $project);
+
+        $leads = $this->leadService->filter($project, $request->validated());
+
+        return ProjectLeadResource::collection($leads)->response();
+    }
 
     public function store(StoreLeadRequest $request, Project $project): JsonResponse
     {

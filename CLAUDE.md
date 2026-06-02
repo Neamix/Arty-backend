@@ -60,7 +60,47 @@ Repository use injected model instance to build queries: `$this->user->newQuery(
 <!-- DB engine, queue driver, cache, frontend framework, auth method. -->
 
 ## Conventions & Rules
-<!-- Naming, file layout, patterns to follow or avoid. -->
+
+### Model: scopeFilter required
+
+Every model MUST have a `scopeFilter` scope used by filter endpoints to apply query constraints:
+
+```php
+public function scopeFilter(Builder $query, array $filters): void
+{
+    if (isset($filters['some_id'])) {
+        $query->where('some_id', $filters['some_id']);
+    }
+}
+```
+
+- Scope is the single entry point for all filterable columns.
+- Repository calls it: `$this->model->newQuery()->filter($filters)->get()`.
+- Never put raw filter `where` clauses outside the scope.
+
+### Filter endpoints: validate before filter
+
+Every filter endpoint MUST use a dedicated `FormRequest` to validate filter inputs before passing them to `scopeFilter`. Never pass raw `$request->all()` or `$request->query()` to a scope.
+
+```php
+// Controller
+public function index(FilterSomethingRequest $request): JsonResponse
+{
+    $items = $this->service->filter($request->validated());
+    ...
+}
+```
+
+### Migrations: workspace_id required
+
+Every migration that creates a new top-level entity table MUST include a `workspace_id` foreign key to identify the workspace owner:
+
+```php
+$table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
+$table->index('workspace_id');
+```
+
+Child tables that are always accessed through a parent (e.g. `project_stages` through `projects`) do not need their own `workspace_id` — workspace is resolved via the parent relationship.
 
 ## Modules
 <!-- List active modules and their roles. Example below — replace. -->

@@ -12,6 +12,17 @@ class ProjectLeadRepository
 {
     public function __construct(private ProjectLead $lead) {}
 
+    public function filter(int $projectId, array $filters, int $perPage = 30): CursorPaginator
+    {
+        return $this->lead->newQuery()
+            ->where('project_id', $projectId)
+            ->filter($filters)
+            ->with('values')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->cursorPaginate($perPage);
+    }
+
     public function paginateForStage(int $stageId, int $perPage = 30): CursorPaginator
     {
         return $this->lead->newQuery()

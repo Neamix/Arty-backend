@@ -22,6 +22,7 @@ Route::middleware('auth:api')->prefix('v1')->name('projects.')->group(function (
         });
 
         Route::prefix('projects/{project}/leads')->name('leads.')->group(function () {
+            Route::get('/', [ProjectLeadController::class, 'index'])->name('index');
             Route::post('/', [ProjectLeadController::class, 'store'])->name('store');
             Route::put('{lead}', [ProjectLeadController::class, 'update'])->name('update');
             Route::delete('{lead}', [ProjectLeadController::class, 'destroy'])->name('destroy');

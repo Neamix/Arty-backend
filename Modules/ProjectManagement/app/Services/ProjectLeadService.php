@@ -53,6 +53,17 @@ class ProjectLeadService
         $this->leadRepository->delete($lead);
     }
 
+    public function filter(Project $project, array $filters, int $perPage = 30): CursorPaginator
+    {
+        $leads = $this->leadRepository->filter($project->id, $filters, $perPage);
+
+        foreach ($leads->items() as $lead) {
+            $lead->setAttribute('card_title_field_id', $project->card_title_field_id);
+        }
+
+        return $leads;
+    }
+
     public function leadsForStage(Project $project, ProjectStage $stage, int $perPage = 30): CursorPaginator
     {
         $leads = $this->leadRepository->paginateForStage($stage->id, $perPage);
