@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProjectLeadValue extends Model
+class LeadValue extends Model
 {
     protected $fillable = [
-        'project_lead_id',
+        'lead_id',
         'project_form_field_id',
         'value',
     ];
 
     public function scopeFilter(Builder $query, array $filters): void
     {
-        if (isset($filters['project_lead_id'])) {
-            $query->where('project_lead_id', $filters['project_lead_id']);
+        if (isset($filters['lead_id'])) {
+            $query->where('lead_id', $filters['lead_id']);
         }
 
         if (isset($filters['project_form_field_id'])) {
@@ -34,7 +34,7 @@ class ProjectLeadValue extends Model
 
     public function lead(): BelongsTo
     {
-        return $this->belongsTo(ProjectLead::class, 'project_lead_id');
+        return $this->belongsTo(Lead::class, 'lead_id');
     }
 
     public function field(): BelongsTo

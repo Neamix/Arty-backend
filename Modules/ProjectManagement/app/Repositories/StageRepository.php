@@ -4,13 +4,13 @@ namespace Modules\ProjectManagement\Repositories;
 
 use Illuminate\Support\Facades\Date;
 use Modules\ProjectManagement\Models\Project;
-use Modules\ProjectManagement\Models\ProjectStage;
+use Modules\ProjectManagement\Models\Stage;
 
-class ProjectStageRepository
+class StageRepository
 {
-    public function __construct(private ProjectStage $stage) {}
+    public function __construct(private Stage $stage) {}
 
-    public function createForProject(Project $project, array $attributes): ProjectStage
+    public function createForProject(Project $project, array $attributes): Stage
     {
         return $project->stages()->create($attributes);
     }
@@ -34,14 +34,14 @@ class ProjectStageRepository
         $this->stage->newQuery()->insert($rows);
     }
 
-    public function update(ProjectStage $stage, array $attributes): ProjectStage
+    public function update(Stage $stage, array $attributes): Stage
     {
         $stage->update($attributes);
 
         return $stage;
     }
 
-    public function delete(ProjectStage $stage): void
+    public function delete(Stage $stage): void
     {
         $stage->delete();
     }
@@ -59,7 +59,7 @@ class ProjectStageRepository
             ->update(['sort_order' => $this->stage->getConnection()->raw('CASE id '.implode(' ', $cases).' END')]);
     }
 
-    public function firstBySortOrder(int $projectId): ?ProjectStage
+    public function firstBySortOrder(int $projectId): ?Stage
     {
         return $this->stage->newQuery()
             ->where('project_id', $projectId)

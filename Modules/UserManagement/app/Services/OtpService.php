@@ -2,8 +2,8 @@
 
 namespace Modules\UserManagement\Services;
 
+use App\Services\MailService;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Modules\UserManagement\Enums\OtpUsage;
 use Modules\UserManagement\Exceptions\OtpException;
 use Modules\UserManagement\Mail\OtpMail;
@@ -12,11 +12,11 @@ use Modules\UserManagement\Repositories\OtpRepository;
 
 class OtpService
 {
-    public function __construct(private OtpRepository $otpRepository) {}
+    public function __construct(
+        private OtpRepository $otpRepository,
+        private MailService $mailService,
+    ) {}
 
-    /**
-     * Generate, persist, and email an OTP for the given email + usage.
-     */
     public function sendOtp(string $email, OtpUsage $usage): Otp
     {
         $this->otpRepository->deleteUnverifiedFor($email, $usage);
@@ -31,7 +31,7 @@ class OtpService
             'expires_at' => Carbon::now()->addMinutes($expiresInMinutes),
         ]);
 
-        Mail::to($email)->send(new OtpMail($code, $usage, $expiresInMinutes));
+        $this->mailService->send($email, new OtpMail($code, $usage, $expiresInMinutes));
 
         return $otp;
     }

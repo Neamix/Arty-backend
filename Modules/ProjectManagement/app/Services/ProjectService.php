@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\DB;
 use Modules\ProjectManagement\Models\Project;
 use Modules\ProjectManagement\Repositories\ProjectFormFieldRepository;
 use Modules\ProjectManagement\Repositories\ProjectRepository;
-use Modules\ProjectManagement\Repositories\ProjectStageRepository;
+use Modules\ProjectManagement\Repositories\StageRepository;
 
 class ProjectService
 {
     public function __construct(
         private ProjectRepository $projectRepository,
         private ProjectFormFieldRepository $formFieldRepository,
-        private ProjectStageRepository $stageRepository,
+        private StageRepository $stageRepository,
     ) {}
 
     public function listForUser(User $user): Collection
@@ -54,7 +54,7 @@ class ProjectService
             ARRAY_FILTER_USE_KEY,
         ));
 
-        return $this->projectRepository->loadDetails($project->refresh());
+        return $this->projectRepository->loadDetails($project);
     }
 
     public function delete(Project $project): void

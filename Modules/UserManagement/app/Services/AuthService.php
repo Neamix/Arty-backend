@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\UserManagement\Enums\OtpUsage;
+use Modules\UserManagement\Events\OtpRequested;
+use Modules\UserManagement\Events\UserRegistered;
 use Modules\UserManagement\Exceptions\AuthException;
 use Modules\UserManagement\Exceptions\OtpException;
 use Modules\UserManagement\Repositories\UserRepository;
@@ -21,7 +23,9 @@ class AuthService
     public function register(array $data): array
     {
         $user = $this->saveNewUser($data);
-        $this->otpService->sendOtp($user->email, OtpUsage::EmailVerification);
+
+        UserRegistered::dispatch($user);
+        OtpRequested::dispatch($user->email, OtpUsage::EmailVerification);
 
         return [
             'user' => $user->refresh()->load('workspaces'),
@@ -79,7 +83,7 @@ class AuthService
             throw new AuthException('Email already verified.', 422);
         }
 
-        $this->otpService->sendOtp($email, OtpUsage::EmailVerification);
+        OtpRequested::dispatch($email, OtpUsage::EmailVerification);
     }
 
     /**
@@ -103,6 +107,11 @@ class AuthService
     {
         $token = $user->token();
         $token?->revoke();
+    }
+
+    public function requestPasswordReset(string $email): void
+    {
+        OtpRequested::dispatch($email, OtpUsage::PasswordReset);
     }
 
     /**

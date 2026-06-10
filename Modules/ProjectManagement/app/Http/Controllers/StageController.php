@@ -8,18 +8,18 @@ use Illuminate\Http\Request;
 use Modules\ProjectManagement\Http\Requests\ReorderStagesRequest;
 use Modules\ProjectManagement\Http\Requests\StoreStageRequest;
 use Modules\ProjectManagement\Http\Requests\UpdateStageRequest;
-use Modules\ProjectManagement\Http\Resources\ProjectLeadResource;
-use Modules\ProjectManagement\Http\Resources\ProjectStageResource;
+use Modules\ProjectManagement\Http\Resources\LeadResource;
+use Modules\ProjectManagement\Http\Resources\StageResource;
 use Modules\ProjectManagement\Models\Project;
-use Modules\ProjectManagement\Models\ProjectStage;
-use Modules\ProjectManagement\Services\ProjectLeadService;
-use Modules\ProjectManagement\Services\ProjectStageService;
+use Modules\ProjectManagement\Models\Stage;
+use Modules\ProjectManagement\Services\LeadService;
+use Modules\ProjectManagement\Services\StageService;
 
-class ProjectStageController extends Controller
+class StageController extends Controller
 {
     public function __construct(
-        private ProjectStageService $stageService,
-        private ProjectLeadService $leadService,
+        private StageService $stageService,
+        private LeadService $leadService,
     ) {}
 
     public function store(StoreStageRequest $request, Project $project): JsonResponse
@@ -30,11 +30,11 @@ class ProjectStageController extends Controller
 
         return response()->json([
             'message' => 'Stage created successfully.',
-            'data' => new ProjectStageResource($stage),
+            'data' => new StageResource($stage),
         ], 201);
     }
 
-    public function update(UpdateStageRequest $request, Project $project, ProjectStage $stage): JsonResponse
+    public function update(UpdateStageRequest $request, Project $project, Stage $stage): JsonResponse
     {
         $this->authorizeProject($request, $project);
 
@@ -42,11 +42,11 @@ class ProjectStageController extends Controller
 
         return response()->json([
             'message' => 'Stage updated successfully.',
-            'data' => new ProjectStageResource($stage),
+            'data' => new StageResource($stage),
         ]);
     }
 
-    public function destroy(Request $request, Project $project, ProjectStage $stage): JsonResponse
+    public function destroy(Request $request, Project $project, Stage $stage): JsonResponse
     {
         $this->authorizeProject($request, $project);
 
@@ -68,13 +68,13 @@ class ProjectStageController extends Controller
         ]);
     }
 
-    public function leads(Request $request, Project $project, ProjectStage $stage): JsonResponse
+    public function leads(Request $request, Project $project, Stage $stage): JsonResponse
     {
         $this->authorizeProject($request, $project);
 
         $leads = $this->leadService->leadsForStage($project, $stage);
 
-        return ProjectLeadResource::collection($leads)->response();
+        return LeadResource::collection($leads)->response();
     }
 
     private function authorizeProject(Request $request, Project $project): void

@@ -3,6 +3,8 @@
 namespace Modules\UserManagement\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\UserManagement\Events\OtpRequested;
+use Modules\UserManagement\Listeners\SendOtpListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -11,7 +13,11 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        OtpRequested::class => [
+            SendOtpListener::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

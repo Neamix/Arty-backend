@@ -14,7 +14,7 @@ class FilterLeadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'stage_id' => ['sometimes', 'integer', 'exists:project_stages,id'],
+            'stage_id' => ['sometimes', 'integer', 'exists:stages,id'],
             'field_values' => ['sometimes', 'array'],
             'field_values.*.field_id' => ['required', 'integer', 'exists:project_form_fields,id'],
             'field_values.*.value' => ['required'],

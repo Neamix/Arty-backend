@@ -37,6 +37,9 @@
             "Modules\\UserManagement\\": "Modules/UserManagement/app/",
             "Modules\\UserManagement\\Database\\Factories\\": "Modules/UserManagement/database/factories/",
             "Modules\\UserManagement\\Database\\Seeders\\": "Modules/UserManagement/database/seeders/",
+            "Modules\\ActivityLog\\": "Modules/ActivityLog/app/",
+            "Modules\\ActivityLog\\Database\\Factories\\": "Modules/ActivityLog/database/factories/",
+            "Modules\\ActivityLog\\Database\\Seeders\\": "Modules/ActivityLog/database/seeders/",
             "Modules\\ProjectManagement\\": "Modules/ProjectManagement/app/",
             "Modules\\ProjectManagement\\Database\\Factories\\": "Modules/ProjectManagement/database/factories/",
             "Modules\\ProjectManagement\\Database\\Seeders\\": "Modules/ProjectManagement/database/seeders/"

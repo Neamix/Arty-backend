@@ -5,6 +5,7 @@ namespace Modules\UserManagement\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Modules\UserManagement\Enums\OtpUsage;
+use Modules\UserManagement\Events\OtpRequested;
 use Modules\UserManagement\Http\Requests\ForgotPasswordRequest;
 use Modules\UserManagement\Http\Requests\ResetPasswordRequest;
 use Modules\UserManagement\Http\Requests\VerifyOtpRequest;
@@ -21,7 +22,7 @@ class ForgotPasswordController extends Controller
 
     public function sendOtp(ForgotPasswordRequest $request): JsonResponse
     {
-        $this->otpService->sendOtp($request->validated('email'), OtpUsage::PasswordReset);
+        OtpRequested::dispatch($request->validated('email'), OtpUsage::PasswordReset);
 
         return response()->json([
             'message' => 'Verification code sent to your email.',

@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('project_leads', function (Blueprint $table) {
+        Schema::create('leads', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('project_stage_id')->constrained('project_stages')->cascadeOnDelete();
+            $table->foreignId('stage_id')->constrained('stages')->cascadeOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->unsignedInteger('sort_order')->default(1);
             $table->timestamps();
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('project_leads');
+        Schema::dropIfExists('leads');
     }
 };

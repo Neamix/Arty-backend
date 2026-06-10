@@ -51,7 +51,7 @@ class ProjectRepository
             'formFields',
             'cardTitleField',
             'stages' => fn ($query) => $query->withCount('leads'),
-            'stages.leads' => fn ($query) => $query->orderBy('sort_order')->limit($leadsPerStage),
+            'stages.leads' => fn ($query) => $query->orderBy('sort_order')->orderBy('id')->limit($leadsPerStage),
             'stages.leads.values',
         ]);
     }

@@ -51,7 +51,7 @@ class Project extends Model
 
     public function stages(): HasMany
     {
-        return $this->hasMany(ProjectStage::class)->orderBy('sort_order');
+        return $this->hasMany(Stage::class)->orderBy('sort_order');
     }
 
     public function formFields(): HasMany
@@ -61,7 +61,7 @@ class Project extends Model
 
     public function leads(): HasMany
     {
-        return $this->hasMany(ProjectLead::class);
+        return $this->hasMany(Lead::class);
     }
 
     protected static function newFactory(): ProjectFactory

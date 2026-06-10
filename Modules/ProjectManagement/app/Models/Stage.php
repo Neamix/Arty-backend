@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ProjectStage extends Model
+class Stage extends Model
 {
     protected $fillable = [
         'project_id',
@@ -36,6 +36,6 @@ class ProjectStage extends Model
 
     public function leads(): HasMany
     {
-        return $this->hasMany(ProjectLead::class)->orderBy('sort_order');
+        return $this->hasMany(Lead::class)->orderBy('sort_order');
     }
 }

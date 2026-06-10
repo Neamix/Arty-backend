@@ -1,0 +1,603 @@
+{
+	"info": {
+		"name": "Artmes API",
+		"description": "API collection for Artmes (UserManagement, ProjectManagement, ActivityLog modules). Login or Register auto-saves the bearer token to the `token` collection variable.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{ "key": "token", "value": "{{token}}", "type": "string" }
+		]
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000" },
+		{ "key": "token", "value": "" },
+		{ "key": "project_id", "value": "1" },
+		{ "key": "stage_id", "value": "1" },
+		{ "key": "lead_id", "value": "1" },
+		{ "key": "attachment_id", "value": "1" }
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json.token) { pm.collectionVariables.set('token', json.token); }"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\",\n    \"workspace_name\": \"My Workspace\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json.token) { pm.collectionVariables.set('token', json.token); }"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"Password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						}
+					}
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/email/verify",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "email", "verify"]
+						}
+					}
+				},
+				{
+					"name": "Resend Email Verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/email/resend",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "email", "resend"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password (Send OTP)",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/password/forgot",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "password", "forgot"]
+						}
+					}
+				},
+				{
+					"name": "Verify Password OTP",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"otp\": \"123456\",\n    \"usage\": \"password_reset\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/password/verify",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "password", "verify"]
+						}
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"NewPassword123\",\n    \"password_confirmation\": \"NewPassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/password/reset",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "password", "reset"]
+						}
+					}
+				},
+				{
+					"name": "Google Redirect",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/google/redirect",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "google", "redirect"]
+						}
+					}
+				},
+				{
+					"name": "Google Callback",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/google/callback?code=",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "google", "callback"],
+							"query": [
+								{ "key": "code", "value": "" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "List Projects",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects"]
+						}
+					}
+				},
+				{
+					"name": "Create Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sales Pipeline\",\n    \"icon\": \"briefcase\",\n    \"form_fields\": [\n        {\n            \"label\": \"Full Name\",\n            \"type\": \"text\",\n            \"required\": true,\n            \"sort_order\": 1\n        },\n        {\n            \"label\": \"Email\",\n            \"type\": \"email\",\n            \"required\": true,\n            \"sort_order\": 2\n        },\n        {\n            \"label\": \"Source\",\n            \"type\": \"select\",\n            \"required\": false,\n            \"sort_order\": 3,\n            \"options\": [\"Website\", \"Referral\", \"Cold Call\"]\n        }\n    ],\n    \"card_title_field_index\": 0,\n    \"stages\": [\n        { \"name\": \"Backlog\", \"sort_order\": 1 },\n        { \"name\": \"In Progress\", \"sort_order\": 2 },\n        { \"name\": \"Done\", \"sort_order\": 3 }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects"]
+						},
+						"description": "Field types: text, textarea, number, email, phone, url, date, time, datetime, select, radio, checkbox, country, state, city, map_location. `options` required for select/radio/checkbox."
+					}
+				},
+				{
+					"name": "Show Project (Board)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Project",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Renamed Pipeline\",\n    \"icon\": \"rocket\",\n    \"card_title_field_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Project",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Stages",
+			"item": [
+				{
+					"name": "Create Stage",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Qualified\",\n    \"sort_order\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/stages",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "stages"]
+						}
+					}
+				},
+				{
+					"name": "Reorder Stages",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stage_ids\": [3, 1, 2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/stages/reorder",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "stages", "reorder"]
+						}
+					}
+				},
+				{
+					"name": "Stage Leads (paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/stages/{{stage_id}}/leads",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "stages", "{{stage_id}}", "leads"],
+							"query": [
+								{ "key": "cursor", "value": "", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Stage",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"In Review\",\n    \"sort_order\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/stages/{{stage_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "stages", "{{stage_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Stage",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/stages/{{stage_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "stages", "{{stage_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Leads",
+			"item": [
+				{
+					"name": "List Leads (filter)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads"],
+							"query": [
+								{ "key": "stage_id", "value": "{{stage_id}}", "disabled": true },
+								{ "key": "field_values[0][field_id]", "value": "1", "disabled": true },
+								{ "key": "field_values[0][value]", "value": "Website", "disabled": true },
+								{ "key": "cursor", "value": "", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"values\": [\n        { \"field_id\": 1, \"value\": \"Jane Smith\" },\n        { \"field_id\": 2, \"value\": \"jane@example.com\" },\n        { \"field_id\": 3, \"value\": \"Website\" }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads"]
+						}
+					}
+				},
+				{
+					"name": "Update Lead",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"values\": [\n        { \"field_id\": 1, \"value\": \"Jane Doe\" }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Move Lead",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stage_id\": 2,\n    \"before_lead_id\": null,\n    \"after_lead_id\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}/move",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}", "move"]
+						},
+						"description": "before_lead_id = lead above the drop position, after_lead_id = lead below. Both null appends to the stage."
+					}
+				},
+				{
+					"name": "Delete Lead",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Attachments",
+			"item": [
+				{
+					"name": "List Attachments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}/attachments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}", "attachments"]
+						}
+					}
+				},
+				{
+					"name": "Upload Attachments",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "attachments[]", "type": "file", "src": [] },
+								{ "key": "attachments[]", "type": "file", "src": [], "disabled": true }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}/attachments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}", "attachments"]
+						},
+						"description": "Max 50 MB per file (max:51200 KB)."
+					}
+				},
+				{
+					"name": "Delete Attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/projects/{{project_id}}/leads/{{lead_id}}/attachments/{{attachment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "projects", "{{project_id}}", "leads", "{{lead_id}}", "attachments", "{{attachment_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Activity Logs",
+			"item": [
+				{
+					"name": "List Activity Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/activity-logs",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "activity-logs"],
+							"query": [
+								{ "key": "event", "value": "created", "disabled": true },
+								{ "key": "subject_type", "value": "Modules\\ProjectManagement\\Models\\Lead", "disabled": true },
+								{ "key": "subject_id", "value": "1", "disabled": true },
+								{ "key": "causer_id", "value": "1", "disabled": true },
+								{ "key": "cursor", "value": "", "disabled": true }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

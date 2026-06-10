@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('project_lead_values', function (Blueprint $table) {
+        Schema::create('lead_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_lead_id')->constrained('project_leads')->cascadeOnDelete();
+            $table->foreignId('lead_id')->constrained('leads')->cascadeOnDelete();
             $table->foreignId('project_form_field_id')->constrained('project_form_fields')->cascadeOnDelete();
             $table->json('value')->nullable();
             $table->timestamps();
 
-            $table->unique(['project_lead_id', 'project_form_field_id'], 'lead_field_unique');
+            $table->unique(['lead_id', 'project_form_field_id'], 'lead_field_unique');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('project_lead_values');
+        Schema::dropIfExists('lead_values');
     }
 };

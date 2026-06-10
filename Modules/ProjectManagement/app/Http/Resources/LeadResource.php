@@ -5,13 +5,13 @@ namespace Modules\ProjectManagement\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProjectLeadResource extends JsonResource
+class LeadResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'project_stage_id' => $this->project_stage_id,
+            'stage_id' => $this->stage_id,
             'sort_order' => $this->sort_order,
             'title' => $this->resolveTitle(),
             'values' => $this->whenLoaded('values', fn () => $this->values->mapWithKeys(

@@ -4,14 +4,14 @@ namespace Modules\ProjectManagement\Services;
 
 use Illuminate\Support\Facades\DB;
 use Modules\ProjectManagement\Models\Project;
-use Modules\ProjectManagement\Models\ProjectStage;
-use Modules\ProjectManagement\Repositories\ProjectStageRepository;
+use Modules\ProjectManagement\Models\Stage;
+use Modules\ProjectManagement\Repositories\StageRepository;
 
-class ProjectStageService
+class StageService
 {
-    public function __construct(private ProjectStageRepository $stageRepository) {}
+    public function __construct(private StageRepository $stageRepository) {}
 
-    public function create(Project $project, array $data): ProjectStage
+    public function create(Project $project, array $data): Stage
     {
         $sortOrder = $data['sort_order']
             ?? ($this->stageRepository->countForProject($project->id) + 1);
@@ -22,12 +22,12 @@ class ProjectStageService
         ]);
     }
 
-    public function update(ProjectStage $stage, array $data): ProjectStage
+    public function update(Stage $stage, array $data): Stage
     {
         return $this->stageRepository->update($stage, $data);
     }
 
-    public function delete(ProjectStage $stage): void
+    public function delete(Stage $stage): void
     {
         $this->stageRepository->delete($stage);
     }

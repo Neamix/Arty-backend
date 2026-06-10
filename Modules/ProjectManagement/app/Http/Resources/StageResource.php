@@ -5,7 +5,7 @@ namespace Modules\ProjectManagement\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProjectStageResource extends JsonResource
+class StageResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -14,7 +14,7 @@ class ProjectStageResource extends JsonResource
             'name' => $this->name,
             'sort_order' => $this->sort_order,
             'leads_count' => $this->whenCounted('leads'),
-            'leads' => ProjectLeadResource::collection($this->whenLoaded('leads')),
+            'leads' => LeadResource::collection($this->whenLoaded('leads')),
         ];
     }
 }

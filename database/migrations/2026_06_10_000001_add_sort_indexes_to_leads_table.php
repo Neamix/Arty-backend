@@ -8,17 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('project_leads', function (Blueprint $table) {
-            $table->index(['project_stage_id', 'sort_order', 'id'], 'project_leads_stage_sort_index');
-            $table->index(['project_id', 'sort_order', 'id'], 'project_leads_project_sort_index');
+        Schema::table('leads', function (Blueprint $table) {
+            $table->index(['stage_id', 'sort_order', 'id'], 'leads_stage_sort_index');
+            $table->index(['project_id', 'sort_order', 'id'], 'leads_project_sort_index');
         });
     }
 
     public function down(): void
     {
-        Schema::table('project_leads', function (Blueprint $table) {
-            $table->dropIndex('project_leads_stage_sort_index');
-            $table->dropIndex('project_leads_project_sort_index');
+        Schema::table('leads', function (Blueprint $table) {
+            $table->dropIndex('leads_stage_sort_index');
+            $table->dropIndex('leads_project_sort_index');
         });
     }
 };

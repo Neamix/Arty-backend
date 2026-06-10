@@ -15,23 +15,23 @@ class MoveLeadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_stage_id' => [
+            'stage_id' => [
                 'required',
                 'integer',
-                Rule::exists('project_stages', 'id')
+                Rule::exists('stages', 'id')
                     ->where('project_id', $this->route('project')->id),
             ],
             'before_lead_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('project_leads', 'id')
-                    ->where('project_stage_id', $this->input('project_stage_id')),
+                Rule::exists('leads', 'id')
+                    ->where('stage_id', $this->input('stage_id')),
             ],
             'after_lead_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('project_leads', 'id')
-                    ->where('project_stage_id', $this->input('project_stage_id')),
+                Rule::exists('leads', 'id')
+                    ->where('stage_id', $this->input('stage_id')),
             ],
         ];
     }

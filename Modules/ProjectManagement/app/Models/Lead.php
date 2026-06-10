@@ -7,28 +7,35 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\ActivityLog\Concerns\LogsActivity;
 
-class ProjectLead extends Model
+class Lead extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'project_id',
-        'project_stage_id',
+        'stage_id',
         'created_by',
         'sort_order',
     ];
 
-    public function scopeFilter(Builder $query, array $request): void
+    public function scopeFilter(Builder $query, array $filters): void
     {
-        if (isset($request['stage_id'])) {
-            $query->where('project_stage_id', $request['stage_id']);
+        if (isset($filters['stage_id'])) {
+            $query->where('stage_id', $filters['stage_id']);
         }
 
-        if (isset($request['project_id'])) {
-            $query->where('project_id', $request['project_id']);
+        if (isset($filters['project_id'])) {
+            $query->where('project_id', $filters['project_id']);
         }
 
-        if (isset($request['field_values'])) {
-            foreach ($request['field_values'] as $fieldFilter) {
+        if (isset($filters['created_by'])) {
+            $query->where('created_by', $filters['created_by']);
+        }
+
+        if (isset($filters['field_values'])) {
+            foreach ($filters['field_values'] as $fieldFilter) {
                 $query->whereHas('values', function (Builder $values) use ($fieldFilter): void {
                     $values
                         ->where('project_form_field_id', $fieldFilter['field_id'])
@@ -52,7 +59,7 @@ class ProjectLead extends Model
 
     public function stage(): BelongsTo
     {
-        return $this->belongsTo(ProjectStage::class, 'project_stage_id');
+        return $this->belongsTo(Stage::class, 'stage_id');
     }
 
     public function creator(): BelongsTo
@@ -62,6 +69,11 @@ class ProjectLead extends Model
 
     public function values(): HasMany
     {
-        return $this->hasMany(ProjectLeadValue::class);
+        return $this->hasMany(LeadValue::class);
+    }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(Attachment::class);
     }
 }

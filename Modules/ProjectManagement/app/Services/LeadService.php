@@ -5,32 +5,34 @@ namespace Modules\ProjectManagement\Services;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\DB;
+use Modules\ActivityLog\Services\ActivityLogger;
+use Modules\ProjectManagement\Models\Lead;
 use Modules\ProjectManagement\Models\Project;
-use Modules\ProjectManagement\Models\ProjectLead;
-use Modules\ProjectManagement\Models\ProjectStage;
-use Modules\ProjectManagement\Repositories\ProjectLeadRepository;
+use Modules\ProjectManagement\Models\Stage;
+use Modules\ProjectManagement\Repositories\LeadRepository;
 use Modules\ProjectManagement\Repositories\ProjectRepository;
-use Modules\ProjectManagement\Repositories\ProjectStageRepository;
+use Modules\ProjectManagement\Repositories\StageRepository;
 
-class ProjectLeadService
+class LeadService
 {
     public const SORT_GAP = 100000;
 
     public const SORT_MIN_GAP = 10000;
 
     public function __construct(
-        private ProjectLeadRepository $leadRepository,
-        private ProjectStageRepository $stageRepository,
+        private LeadRepository $leadRepository,
+        private StageRepository $stageRepository,
         private ProjectRepository $projectRepository,
+        private ActivityLogger $activityLogger,
     ) {}
 
-    public function create(Project $project, User $user, array $data): ProjectLead
+    public function create(Project $project, User $user, array $data): Lead
     {
         return DB::transaction(function () use ($project, $user, $data) {
             $stage = $this->resolveDefaultStage($project);
 
             $lead = $this->leadRepository->createForProject($project, [
-                'project_stage_id' => $stage->id,
+                'stage_id' => $stage->id,
                 'created_by' => $user->id,
                 'sort_order' => $this->leadRepository->nextSortOrder($stage->id),
             ]);
@@ -38,22 +40,45 @@ class ProjectLeadService
             $this->leadRepository->syncValues($lead, $data['values']);
             $this->projectRepository->incrementLeadCount($project);
 
+            $this->activityLogger->log(
+                event: 'created',
+                subject: $lead,
+                causer: $user,
+                properties: ['stage_id' => $stage->id],
+                workspaceId: $project->workspace_id,
+            );
+
             return $lead->load('values');
         });
     }
 
-    public function update(ProjectLead $lead, array $data): ProjectLead
+    public function update(Lead $lead, Project $project, User $causer, array $data): Lead
     {
-        return DB::transaction(function () use ($lead, $data) {
+        return DB::transaction(function () use ($lead, $project, $causer, $data) {
             $this->leadRepository->syncValues($lead, $data['values']);
 
+            $this->activityLogger->log(
+                event: 'updated',
+                subject: $lead,
+                causer: $causer,
+                properties: ['values' => $data['values']],
+                workspaceId: $project->workspace_id,
+            );
+
             return $lead->load('values');
         });
     }
 
-    public function delete(ProjectLead $lead, Project $project): void
+    public function delete(Lead $lead, Project $project, User $causer): void
     {
-        DB::transaction(function () use ($lead, $project) {
+        DB::transaction(function () use ($lead, $project, $causer) {
+            $this->activityLogger->log(
+                event: 'deleted',
+                subject: $lead,
+                causer: $causer,
+                workspaceId: $project->workspace_id,
+            );
+
             $this->leadRepository->delete($lead);
             $this->projectRepository->decrementLeadCount($project);
         });
@@ -70,26 +95,37 @@ class ProjectLeadService
         return $leads;
     }
 
-    public function leadsForStage(Project $project, ProjectStage $stage, int $perPage = 30): CursorPaginator
+    public function leadsForStage(Project $project, Stage $stage, int $perPage = 30): CursorPaginator
     {
         $leads = $this->leadRepository->paginateForStage($stage->id, $perPage);
 
         $leads->getCollection()->each(
-            fn (ProjectLead $lead) => $lead->setAttribute('card_title_field_id', $project->card_title_field_id),
+            fn (Lead $lead) => $lead->setAttribute('card_title_field_id', $project->card_title_field_id),
         );
 
         return $leads;
     }
 
-    public function move(ProjectLead $lead, int $stageId, ?int $beforeLeadId, ?int $afterLeadId): ProjectLead
+    public function move(Lead $lead, Project $project, User $causer, int $stageId, ?int $beforeLeadId, ?int $afterLeadId): Lead
     {
-        return DB::transaction(function () use ($lead, $stageId, $beforeLeadId, $afterLeadId) {
+        return DB::transaction(function () use ($lead, $project, $causer, $stageId, $beforeLeadId, $afterLeadId) {
+            $fromStageId = $lead->stage_id;
             $sortOrder = $this->resolveSortOrder($stageId, $beforeLeadId, $afterLeadId);
 
-            return $this->leadRepository->update($lead, [
-                'project_stage_id' => $stageId,
+            $lead = $this->leadRepository->update($lead, [
+                'stage_id' => $stageId,
                 'sort_order' => $sortOrder,
             ]);
+
+            $this->activityLogger->log(
+                event: 'moved',
+                subject: $lead,
+                causer: $causer,
+                properties: ['from_stage_id' => $fromStageId, 'to_stage_id' => $stageId],
+                workspaceId: $project->workspace_id,
+            );
+
+            return $lead;
         });
     }
 
@@ -124,7 +160,7 @@ class ProjectLeadService
         return intdiv($before + $after, 2);
     }
 
-    private function resolveDefaultStage(Project $project): ProjectStage
+    private function resolveDefaultStage(Project $project): Stage
     {
         $stage = $this->stageRepository->firstBySortOrder($project->id);
 
