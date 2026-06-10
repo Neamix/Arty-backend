@@ -278,3 +278,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+
+
+- Any request need to follow all instructions files inside instruction folder that you will find on the roo directory 
