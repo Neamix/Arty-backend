@@ -4,6 +4,7 @@ namespace Modules\ProjectManagement\Services;
 
 use App\Models\User;
 use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\ActivityLog\Services\ActivityLogger;
 use Modules\ProjectManagement\Models\Lead;
@@ -43,6 +44,7 @@ class LeadService
             $this->activityLogger->log(
                 event: 'created',
                 subject: $lead,
+                description: Auth::user()->name . 'Created the lead',
                 causer: $user,
                 properties: ['stage_id' => $stage->id],
                 workspaceId: $project->workspace_id,

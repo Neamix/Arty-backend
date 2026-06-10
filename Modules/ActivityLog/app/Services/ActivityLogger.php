@@ -4,7 +4,7 @@ namespace Modules\ActivityLog\Services;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\Model;
-use Modules\ActivityLog\Models\ActivityLog;
+use Modules\ActivityLog\Jobs\RecordActivityLog;
 use Modules\ActivityLog\Repositories\ActivityLogRepository;
 
 class ActivityLogger
@@ -12,9 +12,6 @@ class ActivityLogger
     public function __construct(private ActivityLogRepository $activityLogRepository) {}
 
     /**
-     * Record a single activity entry. This is the generic entry point other
-     * modules call to log any create/update/move/delete event.
-     *
      * @param  array<string, mixed>  $properties
      */
     public function log(
@@ -24,8 +21,8 @@ class ActivityLogger
         array $properties = [],
         ?int $workspaceId = null,
         ?string $description = null,
-    ): ActivityLog {
-        return $this->activityLogRepository->create([
+    ): void {
+        RecordActivityLog::dispatch([
             'event' => $event,
             'description' => $description,
             'subject_type' => $subject?->getMorphClass(),
