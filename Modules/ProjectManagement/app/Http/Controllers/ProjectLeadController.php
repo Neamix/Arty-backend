@@ -55,7 +55,7 @@ class ProjectLeadController extends Controller
     {
         $this->authorizeProject($request, $project);
 
-        $this->leadService->delete($lead);
+        $this->leadService->delete($lead, $project);
 
         return response()->json([
             'message' => 'Lead deleted successfully.',
@@ -80,8 +80,4 @@ class ProjectLeadController extends Controller
         ]);
     }
 
-    private function authorizeProject(Request $request, Project $project): void
-    {
-        abort_unless($project->created_by === $request->user()->id, 403);
-    }
 }

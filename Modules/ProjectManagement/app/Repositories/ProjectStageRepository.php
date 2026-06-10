@@ -46,6 +46,19 @@ class ProjectStageRepository
         $stage->delete();
     }
 
+    public function reorderForProject(Project $project, array $orderedStageIds): void
+    {
+        $cases = [];
+
+        foreach (array_values($orderedStageIds) as $index => $stageId) {
+            $cases[] = 'WHEN '.(int) $stageId.' THEN '.($index + 1);
+        }
+
+        $project->stages()
+            ->whereIn('id', $orderedStageIds)
+            ->update(['sort_order' => $this->stage->getConnection()->raw('CASE id '.implode(' ', $cases).' END')]);
+    }
+
     public function firstBySortOrder(int $projectId): ?ProjectStage
     {
         return $this->stage->newQuery()

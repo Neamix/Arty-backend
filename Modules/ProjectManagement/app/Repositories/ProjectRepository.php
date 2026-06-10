@@ -13,9 +13,19 @@ class ProjectRepository
     {
         return $this->project->newQuery()
             ->where('created_by', $userId)
-            ->withCount(['stages', 'leads'])
+            ->withCount('stages')
             ->latest()
             ->get();
+    }
+
+    public function incrementLeadCount(Project $project): void
+    {
+        $project->increment('lead_count');
+    }
+
+    public function decrementLeadCount(Project $project): void
+    {
+        $project->decrement('lead_count');
     }
 
     public function create(array $attributes): Project

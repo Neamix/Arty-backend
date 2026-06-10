@@ -15,7 +15,7 @@ class ProjectResource extends JsonResource
             'icon' => $this->icon,
             'card_title_field_id' => $this->card_title_field_id,
             'created_by' => $this->created_by,
-            'leads_count' => $this->whenCounted('leads'),
+            'leads_count' => $this->lead_count,
             'form_fields' => ProjectFormFieldResource::collection($this->whenLoaded('formFields')),
             'stages' => ProjectStageResource::collection($this->whenLoaded('stages')),
             'created_at' => $this->created_at,

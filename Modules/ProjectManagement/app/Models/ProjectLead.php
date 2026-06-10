@@ -29,7 +29,11 @@ class ProjectLead extends Model
 
         if (isset($request['field_values'])) {
             foreach ($request['field_values'] as $fieldFilter) {
-               
+                $query->whereHas('values', function (Builder $values) use ($fieldFilter): void {
+                    $values
+                        ->where('project_form_field_id', $fieldFilter['field_id'])
+                        ->where('value', json_encode($fieldFilter['value']));
+                });
             }
         }
     }

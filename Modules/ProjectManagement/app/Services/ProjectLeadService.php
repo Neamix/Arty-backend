@@ -9,6 +9,7 @@ use Modules\ProjectManagement\Models\Project;
 use Modules\ProjectManagement\Models\ProjectLead;
 use Modules\ProjectManagement\Models\ProjectStage;
 use Modules\ProjectManagement\Repositories\ProjectLeadRepository;
+use Modules\ProjectManagement\Repositories\ProjectRepository;
 use Modules\ProjectManagement\Repositories\ProjectStageRepository;
 
 class ProjectLeadService
@@ -20,6 +21,7 @@ class ProjectLeadService
     public function __construct(
         private ProjectLeadRepository $leadRepository,
         private ProjectStageRepository $stageRepository,
+        private ProjectRepository $projectRepository,
     ) {}
 
     public function create(Project $project, User $user, array $data): ProjectLead
@@ -34,6 +36,7 @@ class ProjectLeadService
             ]);
 
             $this->leadRepository->syncValues($lead, $data['values']);
+            $this->projectRepository->incrementLeadCount($project);
 
             return $lead->load('values');
         });
@@ -48,9 +51,12 @@ class ProjectLeadService
         });
     }
 
-    public function delete(ProjectLead $lead): void
+    public function delete(ProjectLead $lead, Project $project): void
     {
-        $this->leadRepository->delete($lead);
+        DB::transaction(function () use ($lead, $project) {
+            $this->leadRepository->delete($lead);
+            $this->projectRepository->decrementLeadCount($project);
+        });
     }
 
     public function filter(Project $project, array $filters, int $perPage = 30): CursorPaginator

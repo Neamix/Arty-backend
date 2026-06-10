@@ -15,7 +15,11 @@
       "PowerShell(\"=== lead_debug.json ===\")",
       "Bash(Get-ChildItem -Path \"b:\\\\MyProjects\\\\Artmes\\\\Modules\\\\ProjectManagement\" -Recurse -Filter \"*.php\" -Path \"*migration*\")",
       "Bash(Select-Object FullName)",
-      "Bash(docker restart *)"
+      "Bash(docker restart *)",
+      "PowerShell(php artisan migrate --no-interaction 2>&1)",
+      "PowerShell(vendor/bin/pint --dirty --format agent 2>&1)",
+      "Bash(./vendor/bin/pint --dirty --format agent database/migrations/2026_06_02_005908_add_workspace_id_to_projects_table.php)",
+      "Bash(docker compose *)"
     ]
   }
 }

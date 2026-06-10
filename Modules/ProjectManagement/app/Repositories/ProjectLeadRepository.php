@@ -80,11 +80,17 @@ class ProjectLeadRepository
             ->lockForUpdate()
             ->pluck('id');
 
-        foreach ($leadIds as $index => $id) {
-            $this->lead->newQuery()
-                ->whereKey($id)
-                ->update(['sort_order' => ($index + 1) * ProjectLeadService::SORT_GAP]);
+        if ($leadIds->isEmpty()) {
+            return;
         }
+
+        $cases = $leadIds->map(
+            fn (int $id, int $index): string => 'WHEN '.$id.' THEN '.(($index + 1) * ProjectLeadService::SORT_GAP),
+        )->implode(' ');
+
+        $this->lead->newQuery()
+            ->whereIn('id', $leadIds)
+            ->update(['sort_order' => $this->lead->getConnection()->raw('CASE id '.$cases.' END')]);
     }
 
     public function syncValues(ProjectLead $lead, array $values): void

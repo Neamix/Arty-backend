@@ -35,11 +35,7 @@ class ProjectStageService
     public function reorder(Project $project, array $orderedStageIds): void
     {
         DB::transaction(function () use ($project, $orderedStageIds): void {
-            foreach (array_values($orderedStageIds) as $index => $stageId) {
-                $project->stages()
-                    ->whereKey($stageId)
-                    ->update(['sort_order' => $index + 1]);
-            }
+            $this->stageRepository->reorderForProject($project, $orderedStageIds);
         });
     }
 }
