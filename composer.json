@@ -40,9 +40,9 @@
             "Modules\\ActivityLog\\": "Modules/ActivityLog/app/",
             "Modules\\ActivityLog\\Database\\Factories\\": "Modules/ActivityLog/database/factories/",
             "Modules\\ActivityLog\\Database\\Seeders\\": "Modules/ActivityLog/database/seeders/",
-            "Modules\\ProjectManagement\\": "Modules/ProjectManagement/app/",
-            "Modules\\ProjectManagement\\Database\\Factories\\": "Modules/ProjectManagement/database/factories/",
-            "Modules\\ProjectManagement\\Database\\Seeders\\": "Modules/ProjectManagement/database/seeders/"
+            "Modules\\ProjectManagment\\": "Modules/ProjectManagment/app/",
+            "Modules\\ProjectManagment\\Database\\Factories\\": "Modules/ProjectManagment/database/factories/",
+            "Modules\\ProjectManagment\\Database\\Seeders\\": "Modules/ProjectManagment/database/seeders/"
         }
     },
     "autoload-dev": {

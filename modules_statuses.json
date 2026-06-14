@@ -1,5 +1,6 @@
 {
     "UserManagement": true,
     "ProjectManagement": true,
-    "ActivityLog": true
+    "ActivityLog": true,
+    "ProjectManagment": true
 }
