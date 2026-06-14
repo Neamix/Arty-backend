@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
             $table->string('title');
             $table->timestamps();
 
-            $table->index('title','idx_title_projects');
+            $table->index('workspace_id');
+            $table->index('title', 'idx_title_projects');
         });
     }
 

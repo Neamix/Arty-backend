@@ -2,31 +2,40 @@
 
 namespace Modules\ProjectManagment\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
 use Modules\ProjectManagment\Models\Project;
 
 class ProjectRepository
 {
-    public function __construct(protected Project $project) {}
+    public function __construct(private Project $project) {}
 
-    public function create(array $data) {
-        return $this->project->create($data);
-    }
-
-    public function update(int $id,array $data): Project
+    public function filter(array $filters): Collection
     {
-        $project = $this->find($id);
-        $project->update($data);
-
-        return $project->refresh(); 
+        return $this->project->newQuery()
+            ->filter($filters)
+            ->latest()
+            ->get();
     }
 
     public function find(int $id): Project
     {
-        return $this->project->find($id);
+        return $this->project->newQuery()->findOrFail($id);
     }
 
-    public function filter(array $data)
+    public function create(array $data): Project
     {
-        return $this->project->filter($data);
+        return $this->project->newQuery()->create($data);
+    }
+
+    public function update(Project $project, array $data): Project
+    {
+        $project->update($data);
+
+        return $project->refresh();
+    }
+
+    public function delete(Project $project): void
+    {
+        $project->delete();
     }
 }

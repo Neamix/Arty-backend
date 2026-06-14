@@ -2,24 +2,29 @@
 
 namespace Modules\ProjectManagment\Models;
 
+use App\Models\Concerns\BelongsToWorkspace;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Query\Builder;
-
-// use Modules\ProjectManagment\Database\Factories\ProjectFactory;
 
 class Project extends Model
 {
-    use HasFactory;
+    use BelongsToWorkspace;
 
-    protected $fillable = [];
+    protected $fillable = [
+        'workspace_id',
+        'title',
+    ];
 
-   public function scopeFilter(Builder $builder,array $request): Builder
-   {
-        if (isset($request['title'])) {
-            $builder->where('title','like','%'.$request['title']);
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        if (isset($filters['workspace_id'])) {
+            $query->where('workspace_id', $filters['workspace_id']);
         }
 
-        return $builder;
-   }
+        if (isset($filters['title'])) {
+            $query->where('title', 'like', '%'.$filters['title'].'%');
+        }
+
+        return $query;
+    }
 }

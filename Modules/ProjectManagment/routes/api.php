@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\ProjectManagment\Http\Controllers\ProjectManagmentController;
+use Modules\ProjectManagment\Http\Controllers\ProjectController;
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('projectmanagments', ProjectManagmentController::class)->names('projectmanagment');
+Route::middleware(['auth:api'])->prefix('v1')->group(function () {
+    Route::apiResource('projects', ProjectController::class);
 });
