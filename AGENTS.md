@@ -5,6 +5,11 @@ This project is an **API** (Laravel backend, JSON responses, no Blade views). Al
 <laravel-boost-guidelines>
 === foundation rules ===
 
+# Instruction to follow 
+Before make any thing you have to populate your context using 
+- feature/authentication.md
+- featurre/how-to-code.md
+
 # Laravel Boost Guidelines
 
 The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to ensure the best experience when building Laravel applications.
@@ -158,5 +163,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - The `{name}` argument should not include the test suite directory. Use `php artisan make:test --pest SomeFeatureTest` instead of `php artisan make:test --pest Feature/SomeFeatureTest`.
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
+
 
 </laravel-boost-guidelines>

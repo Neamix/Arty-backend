@@ -54,7 +54,7 @@ public function __construct(private UserRepository $userRepository) {}
 public function __construct(private User $user) {}
 ```
 
-Repository use injected model instance to build queries: `$this->user->newQuery()->where(...)`. No static `User::` call inside repository.
+Repository use injected model instance to build queries: `$this->user->where(...)`. No static `User::` call inside repository.
 
 ## Tech Stack Specifics
 <!-- DB engine, queue driver, cache, frontend framework, auth method. -->
