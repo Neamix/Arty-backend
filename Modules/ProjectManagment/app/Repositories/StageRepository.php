@@ -43,4 +43,17 @@ class StageRepository
         return (int) $this->stage->where('project_id', $projectId)
             ->max('sort_order') + 1;
     }
+
+    public function forBoard(int $projectId, int $limit): Collection
+    {
+        return $this->stage->where('project_id', $projectId)
+            ->orderBy('sort_order')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function countForProject(int $projectId): int
+    {
+        return $this->stage->where('project_id', $projectId)->count();
+    }
 }

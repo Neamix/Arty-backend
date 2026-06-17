@@ -40,6 +40,48 @@ class LeadRepository
     }
 
     /**
+     * Flat list of leads for the given stages, capped at $perStage each (window function).
+     *
+     * @param  array<int, int>  $stageIds
+     */
+    public function boardLeads(array $stageIds, int $perStage): Collection
+    {
+        if (empty($stageIds)) {
+            return new Collection;
+        }
+
+        $ranked = $this->lead
+            ->select('*')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY stage_id ORDER BY created_at DESC, id DESC) as rn')
+            ->whereIn('stage_id', $stageIds);
+
+        return $this->lead
+            ->fromSub($ranked, 'leads')
+            ->where('rn', '<=', $perStage)
+            ->with('answers.field')
+            ->orderBy('stage_id')
+            ->get();
+    }
+
+    /**
+     * @param  array<int, int>  $stageIds
+     * @return array<int, int> map of stage_id => total lead count
+     */
+    public function countsByStage(array $stageIds): array
+    {
+        if (empty($stageIds)) {
+            return [];
+        }
+
+        return $this->lead
+            ->whereIn('stage_id', $stageIds)
+            ->selectRaw('stage_id, COUNT(*) as aggregate')
+            ->groupBy('stage_id')
+            ->pluck('aggregate', 'stage_id')
+            ->all();
+    }
+
+    /**
      * @param  array<int, string|null>  $answers  map of field_id => value
      */
     public function syncAnswers(Lead $lead, array $answers): void

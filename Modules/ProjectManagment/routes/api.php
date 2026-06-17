@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\ProjectManagment\Http\Controllers\BoardController;
 use Modules\ProjectManagment\Http\Controllers\FieldController;
 use Modules\ProjectManagment\Http\Controllers\FieldOptionController;
 use Modules\ProjectManagment\Http\Controllers\FormController;
@@ -9,6 +10,8 @@ use Modules\ProjectManagment\Http\Controllers\ProjectController;
 use Modules\ProjectManagment\Http\Controllers\StageController;
 
 Route::middleware(['auth:api'])->prefix('v1')->group(function () {
+    Route::get('projects/{project}/board', [BoardController::class, 'show'])->name('projects.board.show');
+
     Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
