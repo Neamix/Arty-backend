@@ -1,5 +1,27 @@
 - this md file show you the guide lines you should to follow to code 
 
+# Workspace scoping
+- EVERY model MUST use the `App\Models\Concerns\BelongsToWorkspace` trait. There is no child-table exception — parent, child, pivot-like tables all carry their own `workspace_id` and scope directly.
+- The trait only works if the model's table has a `workspace_id` column. Every `create` migration MUST add it (and an index):
+
+```php
+$table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
+$table->index('workspace_id');
+```
+
+- The trait applies the `WorkspaceScope` global scope (`WHERE table.workspace_id IN (...)`), auto-assigns `workspace_id` from the authenticated user's workspace on create, and re-enforces it on update. The client NEVER sends `workspace_id` and you NEVER filter it manually in a service or repository.
+
+```php
+use App\Models\Concerns\BelongsToWorkspace;
+
+class Stage extends Model
+{
+    use BelongsToWorkspace;
+
+    protected $fillable = ['workspace_id', /* ... */];
+}
+```
+
 # Crud operation 
 - any feature will have some crud operation maybe some maybe all so you need to follow the comming list 
 

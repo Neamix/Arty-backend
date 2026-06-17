@@ -44,7 +44,13 @@ class FieldService
                 'is_required' => $data['is_required'] ?? false,
                 'sort_order' => $data['sort_order'] ?? $this->fieldRepository->nextSortOrder($form->id),
                 'config' => $data['config'] ?? null,
+                'default_value' => $data['default_value'] ?? null,
+                'is_title' => $data['is_title'] ?? false,
             ]);
+
+            if ($field->is_title) {
+                $this->fieldRepository->clearTitleFlag($form->id, $field->id);
+            }
 
             if (! empty($data['options'])) {
                 $this->fieldOptionService->sync($field, $data['options']);
@@ -60,7 +66,11 @@ class FieldService
         $field = $this->findForForm($form, $fieldId);
 
         return DB::transaction(function () use ($field, $data) {
-            $field = $this->fieldRepository->update($field, Arr::only($data, ['label', 'type', 'is_required', 'sort_order', 'config']));
+            $field = $this->fieldRepository->update($field, Arr::only($data, ['label', 'type', 'is_required', 'sort_order', 'config', 'default_value', 'is_title']));
+
+            if ($field->is_title) {
+                $this->fieldRepository->clearTitleFlag($field->form_id, $field->id);
+            }
 
             if (array_key_exists('options', $data)) {
                 $this->fieldOptionService->sync($field, $data['options'] ?? []);

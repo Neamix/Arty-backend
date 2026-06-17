@@ -2,13 +2,17 @@
 
 namespace Modules\ProjectManagment\Models;
 
+use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FieldOption extends Model
 {
+    use BelongsToWorkspace;
+
     protected $fillable = [
+        'workspace_id',
         'field_id',
         'label',
         'value',

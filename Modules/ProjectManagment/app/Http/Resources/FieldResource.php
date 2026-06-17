@@ -20,6 +20,8 @@ class FieldResource extends JsonResource
             'is_required' => $this->is_required,
             'sort_order' => $this->sort_order,
             'config' => $this->config,
+            'default_value' => $this->default_value,
+            'is_title' => $this->is_title,
             'options' => FieldOptionResource::collection($this->whenLoaded('options')),
         ];
     }

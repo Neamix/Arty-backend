@@ -108,16 +108,16 @@ public function index(FilterSomethingRequest $request): JsonResponse
 }
 ```
 
-### Migrations: workspace_id required
+### Migrations: workspace_id required on every table
 
-Every migration that creates a new top-level entity table MUST include a `workspace_id` foreign key to identify the workspace owner:
+EVERY migration that creates a table MUST include a `workspace_id` foreign key — there is no child-table exception. Parent, child, and pivot-like tables all carry their own `workspace_id` so the `BelongsToWorkspace` trait can scope them directly:
 
 ```php
 $table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
 $table->index('workspace_id');
 ```
 
-Child tables that are always accessed through a parent (e.g. `project_stages` through `projects`) do not need their own `workspace_id` — workspace is resolved via the parent relationship.
+Every model MUST use `App\Models\Concerns\BelongsToWorkspace`, which requires this column to exist. See `instructions/how-to-code.md` (Workspace scoping).
 
 ## Modules
 <!-- List active modules and their roles. Example below — replace. -->

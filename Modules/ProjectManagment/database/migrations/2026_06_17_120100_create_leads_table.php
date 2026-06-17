@@ -6,29 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('stages', function (Blueprint $table) {
+        Schema::create('leads', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workspace_id')->constrained('workspaces')->cascadeOnDelete();
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->string('name');
-            $table->unsignedInteger('sort_order')->default(0);
+            $table->foreignId('stage_id')->constrained('stages')->cascadeOnDelete();
+            $table->dateTime('due_date')->nullable();
             $table->timestamps();
 
             $table->index('workspace_id');
-            $table->index(['project_id', 'sort_order']);
+            $table->index('stage_id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('stages');
+        Schema::dropIfExists('leads');
     }
 };

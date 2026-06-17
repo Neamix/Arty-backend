@@ -25,6 +25,8 @@ class UpdateFieldRequest extends FormRequest
             'is_required' => ['sometimes', 'boolean'],
             'sort_order' => ['sometimes', 'integer', 'min:0'],
             'config' => ['sometimes', 'nullable', 'array'],
+            'default_value' => ['sometimes', 'nullable', 'string', 'max:255', 'required_if:is_title,true'],
+            'is_title' => ['sometimes', 'boolean'],
             'options' => ['sometimes', 'array'],
             'options.*.label' => ['required_with:options', 'string', 'max:255'],
             'options.*.value' => ['required_with:options', 'string', 'max:255'],

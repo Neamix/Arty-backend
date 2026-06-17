@@ -40,8 +40,30 @@ class FieldRepository
 
     public function nextSortOrder(int $formId): int
     {
-        return (int) $this->field->newQuery()
-            ->where('form_id', $formId)
+        return (int) $this->field->where('form_id', $formId)
             ->max('sort_order') + 1;
+    }
+
+    public function titleField(int $formId): ?Field
+    {
+        return $this->field->where('form_id', $formId)
+            ->where('is_title', true)
+            ->first();
+    }
+
+    public function clearTitleFlag(int $formId, ?int $exceptFieldId = null): void
+    {
+        $this->field->where('form_id', $formId)
+            ->where('is_title', true)
+            ->when($exceptFieldId, fn ($query) => $query->where('id', '!=', $exceptFieldId))
+            ->update(['is_title' => false]);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function formFieldIds(int $formId): array
+    {
+        return $this->field->where('form_id', $formId)->pluck('id')->all();
     }
 }

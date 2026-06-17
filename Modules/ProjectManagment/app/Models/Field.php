@@ -2,6 +2,7 @@
 
 namespace Modules\ProjectManagment\Models;
 
+use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,13 +11,18 @@ use Modules\ProjectManagment\Enums\FieldType;
 
 class Field extends Model
 {
+    use BelongsToWorkspace;
+
     protected $fillable = [
+        'workspace_id',
         'form_id',
         'label',
         'type',
         'is_required',
         'sort_order',
         'config',
+        'default_value',
+        'is_title',
     ];
 
     /**
@@ -28,6 +34,7 @@ class Field extends Model
             'type' => FieldType::class,
             'is_required' => 'boolean',
             'config' => 'array',
+            'is_title' => 'boolean',
         ];
     }
 

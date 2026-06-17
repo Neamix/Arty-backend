@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\ProjectManagment\Http\Controllers\FieldController;
 use Modules\ProjectManagment\Http\Controllers\FieldOptionController;
 use Modules\ProjectManagment\Http\Controllers\FormController;
+use Modules\ProjectManagment\Http\Controllers\LeadController;
 use Modules\ProjectManagment\Http\Controllers\ProjectController;
 use Modules\ProjectManagment\Http\Controllers\StageController;
 
@@ -25,6 +26,13 @@ Route::middleware(['auth:api'])->prefix('v1')->group(function () {
     Route::put('projects/{project}/stages/{stage}', [StageController::class, 'update'])->name('projects.stages.update');
     Route::patch('projects/{project}/stages/{stage}', [StageController::class, 'update']);
     Route::delete('projects/{project}/stages/{stage}', [StageController::class, 'destroy'])->name('projects.stages.destroy');
+
+    Route::get('projects/{project}/stages/{stage}/leads', [LeadController::class, 'index'])->name('projects.stages.leads.index');
+    Route::post('projects/{project}/stages/{stage}/leads', [LeadController::class, 'store'])->name('projects.stages.leads.store');
+    Route::get('projects/{project}/stages/{stage}/leads/{lead}', [LeadController::class, 'show'])->name('projects.stages.leads.show');
+    Route::put('projects/{project}/stages/{stage}/leads/{lead}', [LeadController::class, 'update'])->name('projects.stages.leads.update');
+    Route::patch('projects/{project}/stages/{stage}/leads/{lead}', [LeadController::class, 'update']);
+    Route::delete('projects/{project}/stages/{stage}/leads/{lead}', [LeadController::class, 'destroy'])->name('projects.stages.leads.destroy');
 
     Route::get('projects/{project}/fields', [FieldController::class, 'index'])->name('projects.fields.index');
     Route::post('projects/{project}/fields', [FieldController::class, 'store'])->name('projects.fields.store');
