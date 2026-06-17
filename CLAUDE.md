@@ -75,8 +75,25 @@ public function scopeFilter(Builder $query, array $filters): void
 ```
 
 - Scope is the single entry point for all filterable columns.
-- Repository calls it: `$this->model->newQuery()->filter($filters)->get()`.
+- Repository calls it: `$this->model->filter($filters)->get()`.
 - Never put raw filter `where` clauses outside the scope.
+
+### Routes: explicit verbs, no apiResource
+
+Never use `Route::apiResource` / `Route::resource`. Declare every route explicitly with its HTTP verb (`get`, `post`, `put`, `patch`, `delete`) and a `->name()`. Update mutations register both `put` and `patch` to the same controller method.
+
+```php
+Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
+Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+Route::patch('projects/{project}', [ProjectController::class, 'update']);
+Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+```
+
+### Repositories: no ->newQuery()
+
+Call query methods directly on the injected model (`$this->model->where(...)`, `$this->model->findOrFail($id)`). Do not prefix with `->newQuery()` — Eloquent already forwards instance calls to a fresh builder.
 
 ### Filter endpoints: validate before filter
 

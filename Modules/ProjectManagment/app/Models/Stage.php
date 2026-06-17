@@ -1,0 +1,34 @@
+<?php
+
+namespace Modules\ProjectManagment\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Stage extends Model
+{
+    protected $fillable = [
+        'project_id',
+        'name',
+        'sort_order',
+    ];
+
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        if (isset($filters['project_id'])) {
+            $query->where('project_id', $filters['project_id']);
+        }
+
+        if (isset($filters['name'])) {
+            $query->where('name', 'like', '%'.$filters['name']);
+        }
+
+        return $query;
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
+}

@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\DB;
 use Modules\ProjectManagment\Models\Project;
 use Modules\ProjectManagment\Repositories\FormRepository;
 use Modules\ProjectManagment\Repositories\ProjectRepository;
+use Modules\ProjectManagment\Repositories\StageRepository;
 
 class ProjectService
 {
     public function __construct(
         private ProjectRepository $projectRepository,
         private FormRepository $formRepository,
+        private StageRepository $stageRepository,
     ) {}
 
     public function filter(array $filters): Collection
@@ -30,6 +32,7 @@ class ProjectService
         return DB::transaction(function () use ($data) {
             $project = $this->projectRepository->create($data);
             $this->formRepository->create(['project_id' => $project->id]);
+            $this->stageRepository->create(['project_id' => $project->id, 'name' => 'drafted', 'sort_order' => 1]);
 
             return $project;
         });
