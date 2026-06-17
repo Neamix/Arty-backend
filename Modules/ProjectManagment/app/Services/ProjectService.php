@@ -3,12 +3,17 @@
 namespace Modules\ProjectManagment\Services;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Modules\ProjectManagment\Models\Project;
+use Modules\ProjectManagment\Repositories\FormRepository;
 use Modules\ProjectManagment\Repositories\ProjectRepository;
 
 class ProjectService
 {
-    public function __construct(private ProjectRepository $projectRepository) {}
+    public function __construct(
+        private ProjectRepository $projectRepository,
+        private FormRepository $formRepository,
+    ) {}
 
     public function filter(array $filters): Collection
     {
@@ -20,12 +25,15 @@ class ProjectService
         return $this->projectRepository->find($id);
     }
 
-  
     public function create(array $data): Project
     {
-        return $this->projectRepository->create($data);
-    }
+        return DB::transaction(function () use ($data) {
+            $project = $this->projectRepository->create($data);
+            $this->formRepository->create(['project_id' => $project->id]);
 
+            return $project;
+        });
+    }
 
     public function update(int $id, array $data): Project
     {

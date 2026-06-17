@@ -11,20 +11,19 @@ class FieldRepository
 
     public function filter(array $filters): Collection
     {
-        return $this->field->newQuery()
-            ->filter($filters)
+        return $this->field->filter($filters)
             ->orderBy('sort_order')
             ->get();
     }
 
     public function find(int $id): Field
     {
-        return $this->field->newQuery()->findOrFail($id);
+        return $this->field->findOrFail($id);
     }
 
     public function create(array $data): Field
     {
-        return $this->field->newQuery()->create($data);
+        return $this->field->create($data);
     }
 
     public function update(Field $field, array $data): Field

@@ -13,19 +13,15 @@ class FormService
         private FormRepository $formRepository,
     ) {}
 
-    public function find(int $id): Form
+
+    public function find(int $projectId): Form
     {
-        return $this->formRepository->find($id);
+        return $this->formRepository->find($projectId);
     }
 
-    public function create(array $data): Form
+    public function update(int $projectId, array $data): Form
     {
-        return $this->formRepository->create($data);
-    }
-
-    public function update(int $id, array $data): Form
-    {
-        $form = $this->formRepository->find($id);
+        $form = $this->find($projectId);
 
         return $this->formRepository->update($form, $data);
     }

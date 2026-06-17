@@ -5,6 +5,7 @@ namespace Modules\ProjectManagment\Models;
 use App\Models\Concerns\BelongsToWorkspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Project extends Model
 {
@@ -13,7 +14,13 @@ class Project extends Model
     protected $fillable = [
         'workspace_id',
         'title',
+        'avatar_name',
     ];
+
+    public function form(): HasOne
+    {
+        return $this->hasOne(Form::class);
+    }
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {

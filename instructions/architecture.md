@@ -17,3 +17,5 @@ To know how to do that you need to do the following decide first what is the mai
 - Do not write prose comments on functions. PHPDoc blocks are only for type information (array shapes via `@param`/`@return`).
 
 - Do not create factories unless explicitly requested.
+
+- Testing: every public Service method MUST have a corresponding test covering its behavior (happy path + relevant edge cases such as not-found or validation failures). Use Pest feature tests. A Service function is not done until its test exists and passes.

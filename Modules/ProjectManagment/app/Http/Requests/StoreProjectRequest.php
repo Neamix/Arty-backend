@@ -19,6 +19,7 @@ class StoreProjectRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'avatar_name' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

@@ -7,8 +7,10 @@ This project is an **API** (Laravel backend, JSON responses, no Blade views). Al
 
 # Instruction to follow 
 Before make any thing you have to populate your context using 
-- feature/authentication.md
-- featurre/how-to-code.md
+- instructions/authentication.md
+- instructions/how-to-code.md
+
+Any code you write MUST follow `instructions/how-to-code.md`. The CRUD flows (listing, read, update, delete) defined there are mandatory — Controller → Service → Repository → Model layering, scopeFilter for listing, and FormRequest validation on every endpoint.
 
 # Laravel Boost Guidelines
 
