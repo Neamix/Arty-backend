@@ -18,6 +18,8 @@ use Modules\UserManagement\Models\Workspace;
  */
 trait BelongsToWorkspace
 {
+    protected static array $workspaceIdCache = [];
+
     public static function bootBelongsToWorkspace(): void
     {
         static::addGlobalScope(new WorkspaceScope);
@@ -44,6 +46,12 @@ trait BelongsToWorkspace
 
     protected static function currentWorkspaceId(): ?int
     {
-        return Auth::user()?->workspaces()->value('id');
+        $userId = Auth::id();
+
+        if ($userId === null) {
+            return null;
+        }
+
+        return static::$workspaceIdCache[$userId] ??= Auth::user()->workspaces()->value('id');
     }
 }
