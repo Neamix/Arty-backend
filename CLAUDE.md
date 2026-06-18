@@ -59,6 +59,8 @@ Repository use injected model instance to build queries: `$this->user->where(...
 ## Tech Stack Specifics
 <!-- DB engine, queue driver, cache, frontend framework, auth method. -->
 
+Runs on Docker (see `Dockerfile`). Run artisan/composer/npm inside the container, not host.
+
 ## Conventions & Rules
 
 ### Model: scopeFilter required
