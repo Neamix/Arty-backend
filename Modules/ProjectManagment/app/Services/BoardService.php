@@ -42,13 +42,13 @@ class BoardService
         $skeleton = Cache::remember("board_skeleton:{$project->id}", self::SKELETON_TTL, fn () => $this->buildSkeleton($project));
 
         $stageIds = array_column($skeleton['stages'], 'id');
-        $leads = $this->leadRepository->boardLeads($stageIds, self::LEADS_PER_STAGE)->groupBy('stage_id');
+        $stagesWithLeads = $this->stageRepository->boardLeads($stageIds, self::LEADS_PER_STAGE);
         $counts = $this->leadRepository->countsByStage($stageIds);
 
         $stages = array_map(fn (array $stage) => [
             ...$stage,
             'has_more' => ($counts[$stage['id']] ?? 0) > self::LEADS_PER_STAGE,
-            'leads' => LeadResource::collection($leads->get($stage['id'], collect())),
+            'leads' => LeadResource::collection($stagesWithLeads->get($stage['id'])?->leads ?? collect()),
         ], $skeleton['stages']);
 
         return [

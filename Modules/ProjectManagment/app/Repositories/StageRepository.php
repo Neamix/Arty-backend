@@ -9,6 +9,20 @@ class StageRepository
 {
     public function __construct(private Stage $stage) {}
 
+    public function boardLeads(array $stageIds, int $perStage): Collection
+    {
+        return $this->stage->whereIn('id', $stageIds)
+            ->with([
+                'leads' => fn ($query) => $query
+                    ->latest()
+                    ->latest('id')
+                    ->limit($perStage)
+                    ->with('answers.field'),
+            ])
+            ->get()
+            ->keyBy('id');
+    }
+
     public function filter(array $filters): Collection
     {
         return $this->stage->filter($filters)
