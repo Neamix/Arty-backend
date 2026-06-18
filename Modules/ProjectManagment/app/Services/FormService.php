@@ -18,7 +18,7 @@ class FormService
         return $this->formRepository->find($projectId);
     }
 
-    public function resolveForProject(int $projectId): Form
+    public function findOrCreate(int $projectId): Form
     {
         return $this->formRepository->firstOrCreateForProject($projectId);
     }

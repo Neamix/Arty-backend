@@ -20,21 +20,21 @@ class FieldService
 
     public function filter(int $projectId, array $filters): Collection
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
 
         return $this->fieldRepository->filter([...$filters, 'form_id' => $form->id]);
     }
 
     public function find(int $projectId, int $fieldId): Field
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
 
         return $this->findForForm($form, $fieldId)->load('options');
     }
 
     public function create(int $projectId, array $data): Field
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
 
         return DB::transaction(function () use ($form, $data) {
             $field = $this->fieldRepository->create([
@@ -62,7 +62,7 @@ class FieldService
 
     public function update(int $projectId, int $fieldId, array $data): Field
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
         $field = $this->findForForm($form, $fieldId);
 
         return DB::transaction(function () use ($field, $data) {
@@ -82,7 +82,7 @@ class FieldService
 
     public function delete(int $projectId, int $fieldId): void
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
         $field = $this->findForForm($form, $fieldId);
 
         $this->fieldRepository->delete($field);

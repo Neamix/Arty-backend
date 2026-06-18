@@ -67,7 +67,7 @@ class FieldOptionService
 
     private function resolveField(int $projectId, int $fieldId): Field
     {
-        $form = $this->formService->resolveForProject($projectId);
+        $form = $this->formService->findOrCreate($projectId);
         $field = $this->fieldRepository->find($fieldId);
 
         if ($field->form_id !== $form->id) {
