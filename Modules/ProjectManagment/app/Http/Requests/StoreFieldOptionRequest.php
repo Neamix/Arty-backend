@@ -3,21 +3,16 @@
 namespace Modules\ProjectManagment\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class StoreFieldOptionRequest extends FormRequest
+class StoreFieldOptionRequest extends FieldOptionRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, array<int, ValidationRule|string>>
      */
     public function rules(): array
     {
         return [
+            ...$this->ownershipRules(),
             'label' => ['required', 'string', 'max:255'],
             'value' => ['required', 'string', 'max:255'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

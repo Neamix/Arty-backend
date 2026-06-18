@@ -12,7 +12,7 @@ class FieldOptionRepository
 
     public function filter(array $filters): Collection
     {
-        return $this->fieldOption->newQuery()
+        return $this->fieldOption
             ->filter($filters)
             ->orderBy('sort_order')
             ->get();
@@ -20,12 +20,12 @@ class FieldOptionRepository
 
     public function find(int $id): FieldOption
     {
-        return $this->fieldOption->newQuery()->findOrFail($id);
+        return $this->fieldOption->findOrFail($id);
     }
 
     public function create(array $data): FieldOption
     {
-        return $this->fieldOption->newQuery()->create($data);
+        return $this->fieldOption->create($data);
     }
 
     public function update(FieldOption $option, array $data): FieldOption
@@ -42,7 +42,7 @@ class FieldOptionRepository
 
     public function nextSortOrder(int $fieldId): int
     {
-        return (int) $this->fieldOption->newQuery()
+        return (int) $this->fieldOption
             ->where('field_id', $fieldId)
             ->max('sort_order') + 1;
     }

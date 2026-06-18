@@ -3,59 +3,47 @@
 namespace Modules\ProjectManagment\Services;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Modules\ProjectManagment\Models\Field;
 use Modules\ProjectManagment\Models\FieldOption;
 use Modules\ProjectManagment\Repositories\FieldOptionRepository;
-use Modules\ProjectManagment\Repositories\FieldRepository;
 
 class FieldOptionService
 {
     public function __construct(
-        private FormService $formService,
-        private FieldRepository $fieldRepository,
         private FieldOptionRepository $fieldOptionRepository,
     ) {}
 
-    public function filter(int $projectId, int $fieldId, array $filters): Collection
+    public function filter(int $fieldId, array $filters): Collection
     {
-        $field = $this->resolveField($projectId, $fieldId);
-
-        return $this->fieldOptionRepository->filter([...$filters, 'field_id' => $field->id]);
+        return $this->fieldOptionRepository->filter([...$filters, 'field_id' => $fieldId]);
     }
 
-    public function find(int $projectId, int $fieldId, int $optionId): FieldOption
+    public function find(int $optionId): FieldOption
     {
-        $field = $this->resolveField($projectId, $fieldId);
-
-        return $this->findForField($field, $optionId);
+        return $this->fieldOptionRepository->find($optionId);
     }
 
-    public function create(int $projectId, int $fieldId, array $data): FieldOption
+    public function create(int $fieldId, array $data): FieldOption
     {
-        $field = $this->resolveField($projectId, $fieldId);
-
         return $this->fieldOptionRepository->create([
-            'field_id' => $field->id,
+            'field_id' => $fieldId,
             'label' => $data['label'],
             'value' => $data['value'],
-            'sort_order' => $data['sort_order'] ?? $this->fieldOptionRepository->nextSortOrder($field->id),
+            'sort_order' => $data['sort_order'] ?? $this->fieldOptionRepository->nextSortOrder($fieldId),
         ]);
     }
 
-    public function update(int $projectId, int $fieldId, int $optionId, array $data): FieldOption
+    public function update(int $optionId, array $data): FieldOption
     {
-        $field = $this->resolveField($projectId, $fieldId);
-        $option = $this->findForField($field, $optionId);
+        $option = $this->fieldOptionRepository->find($optionId);
 
         return $this->fieldOptionRepository->update($option, Arr::only($data, ['label', 'value', 'sort_order']));
     }
 
-    public function delete(int $projectId, int $fieldId, int $optionId): void
+    public function delete(int $optionId): void
     {
-        $field = $this->resolveField($projectId, $fieldId);
-        $option = $this->findForField($field, $optionId);
+        $option = $this->fieldOptionRepository->find($optionId);
 
         $this->fieldOptionRepository->delete($option);
     }
@@ -63,28 +51,5 @@ class FieldOptionService
     public function sync(Field $field, array $options): void
     {
         $this->fieldOptionRepository->replaceForField($field, $options);
-    }
-
-    private function resolveField(int $projectId, int $fieldId): Field
-    {
-        $form = $this->formService->findOrCreate($projectId);
-        $field = $this->fieldRepository->find($fieldId);
-
-        if ($field->form_id !== $form->id) {
-            throw new ModelNotFoundException;
-        }
-
-        return $field;
-    }
-
-    private function findForField(Field $field, int $optionId): FieldOption
-    {
-        $option = $this->fieldOptionRepository->find($optionId);
-
-        if ($option->field_id !== $field->id) {
-            throw new ModelNotFoundException;
-        }
-
-        return $option;
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\ProjectManagment\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Modules\ProjectManagment\Http\Requests\FieldOptionRequest;
 use Modules\ProjectManagment\Http\Requests\FilterFieldOptionRequest;
 use Modules\ProjectManagment\Http\Requests\StoreFieldOptionRequest;
 use Modules\ProjectManagment\Http\Requests\UpdateFieldOptionRequest;
@@ -16,7 +17,7 @@ class FieldOptionController extends Controller
 
     public function index(FilterFieldOptionRequest $request, int $project, int $field): JsonResponse
     {
-        $options = $this->fieldOptionService->filter($project, $field, $request->validated());
+        $options = $this->fieldOptionService->filter($field, $request->validated());
 
         return response()->json([
             'data' => FieldOptionResource::collection($options),
@@ -25,7 +26,7 @@ class FieldOptionController extends Controller
 
     public function store(StoreFieldOptionRequest $request, int $project, int $field): JsonResponse
     {
-        $option = $this->fieldOptionService->create($project, $field, $request->validated());
+        $option = $this->fieldOptionService->create($field, $request->validated());
 
         return response()->json([
             'message' => 'Option created successfully.',
@@ -33,16 +34,16 @@ class FieldOptionController extends Controller
         ], 201);
     }
 
-    public function show(int $project, int $field, int $option): JsonResponse
+    public function show(FieldOptionRequest $request, int $project, int $field, int $option): JsonResponse
     {
         return response()->json([
-            'data' => new FieldOptionResource($this->fieldOptionService->find($project, $field, $option)),
+            'data' => new FieldOptionResource($this->fieldOptionService->find($option)),
         ]);
     }
 
     public function update(UpdateFieldOptionRequest $request, int $project, int $field, int $option): JsonResponse
     {
-        $updated = $this->fieldOptionService->update($project, $field, $option, $request->validated());
+        $updated = $this->fieldOptionService->update($option, $request->validated());
 
         return response()->json([
             'message' => 'Option updated successfully.',
@@ -50,9 +51,9 @@ class FieldOptionController extends Controller
         ]);
     }
 
-    public function destroy(int $project, int $field, int $option): JsonResponse
+    public function destroy(FieldOptionRequest $request, int $project, int $field, int $option): JsonResponse
     {
-        $this->fieldOptionService->delete($project, $field, $option);
+        $this->fieldOptionService->delete($option);
 
         return response()->json([
             'message' => 'Option deleted successfully.',
