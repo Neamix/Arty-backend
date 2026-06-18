@@ -2,7 +2,7 @@
 
 namespace Modules\ProjectManagment\Services;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +26,7 @@ class LeadService
         private LeadRepository $leadRepository,
     ) {}
 
-    public function filter(array $data): Collection
+    public function filter(array $data): CursorPaginator
     {
         $stage = $this->resolveStage($data);
 

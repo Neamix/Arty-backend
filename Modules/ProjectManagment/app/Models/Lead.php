@@ -42,6 +42,20 @@ class Lead extends Model
             $query->where('due_date', '<=', $filters['due_to']);
         }
 
+        if (! empty($filters['answers'])) {
+            foreach ($filters['answers'] as $field) {
+                $query->whereHas('answers', function (Builder $answers) use ($field): void {
+                    $answers->where('field_id', $field['field_id']);
+
+                    match ($field['type']) {
+                        'price' => $answers->whereRaw('CAST(value AS DECIMAL(15,2)) BETWEEN ? AND ?', [$field['value'][0], $field['value'][1]]),
+                        'options', 'checkout' => $answers->whereIn('value', $field['value']),
+                        default => $answers->where('value', $field['value']),
+                    };
+                });
+            }
+        }
+
         return $query;
     }
 
@@ -61,6 +75,7 @@ class Lead extends Model
 
         return $titleAnswer?->value
             ?: $titleAnswer?->field->default_value
-            ?: 'Untitled';
+            ?: $this->answers->first()?->value
+            ?: '';
     }
 }

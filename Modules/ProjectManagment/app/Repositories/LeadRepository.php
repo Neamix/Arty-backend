@@ -2,19 +2,20 @@
 
 namespace Modules\ProjectManagment\Repositories;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\CursorPaginator;
 use Modules\ProjectManagment\Models\Lead;
 
 class LeadRepository
 {
     public function __construct(private Lead $lead) {}
 
-    public function filter(array $filters): Collection
+    public function filter(array $filters, int $perPage = 30): CursorPaginator
     {
         return $this->lead->filter($filters)
             ->with('answers.field')
-            ->latest()
-            ->get();
+            ->orderByDesc('leads.created_at')
+            ->orderByDesc('leads.id')
+            ->cursorPaginate($perPage);
     }
 
     public function find(int $id): Lead
@@ -38,35 +39,7 @@ class LeadRepository
     {
         $lead->delete();
     }
-
-    /**
-     * Flat list of leads for the given stages, capped at $perStage each (window function).
-     *
-     * @param  array<int, int>  $stageIds
-     */
-    public function boardLeads(array $stageIds, int $perStage): Collection
-    {
-        if (empty($stageIds)) {
-            return new Collection;
-        }
-
-        $ranked = $this->lead
-            ->select('*')
-            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY stage_id ORDER BY created_at DESC, id DESC) as rn')
-            ->whereIn('stage_id', $stageIds);
-
-        return $this->lead
-            ->fromSub($ranked, 'leads')
-            ->where('rn', '<=', $perStage)
-            ->with('answers.field')
-            ->orderBy('stage_id')
-            ->get();
-    }
-
-    /**
-     * @param  array<int, int>  $stageIds
-     * @return array<int, int> map of stage_id => total lead count
-     */
+ 
     public function countsByStage(array $stageIds): array
     {
         if (empty($stageIds)) {
@@ -81,13 +54,21 @@ class LeadRepository
             ->all();
     }
 
-    /**
-     * @param  array<int, string|null>  $answers  map of field_id => value
-     */
     public function syncAnswers(Lead $lead, array $answers): void
     {
+        $rows = [];
+
         foreach ($answers as $fieldId => $value) {
-            $lead->answers()->updateOrCreate(['field_id' => $fieldId], ['value' => $value]);
+            $rows[] = [
+                'workspace_id' => $lead->workspace_id,
+                'lead_id' => $lead->id,
+                'field_id' => $fieldId,
+                'value' => $value,
+            ];
+        }
+
+        if ($rows !== []) {
+            $lead->answers()->upsert($rows, ['lead_id', 'field_id'], ['value']);
         }
 
         $lead->load('answers.field');

@@ -30,6 +30,10 @@ class FilterLeadRequest extends FormRequest
             'stage_id' => ['required', 'integer'],
             'due_from' => ['nullable', 'date'],
             'due_to' => ['nullable', 'date', 'after_or_equal:due_from'],
+            'answers' => ['nullable', 'array'],
+            'answers.*.field_id' => ['required', 'integer'],
+            'answers.*.type' => ['required', 'string'],
+            'answers.*.value' => ['required'],
         ];
     }
 }

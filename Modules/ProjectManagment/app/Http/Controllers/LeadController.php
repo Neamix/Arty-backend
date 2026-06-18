@@ -20,9 +20,7 @@ class LeadController extends Controller
     {
         $leads = $this->leadService->filter($request->validated());
 
-        return response()->json([
-            'data' => LeadResource::collection($leads),
-        ]);
+        return LeadResource::collection($leads)->response();
     }
 
     public function store(StoreLeadRequest $request): JsonResponse
