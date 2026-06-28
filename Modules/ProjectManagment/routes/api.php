@@ -11,6 +11,9 @@ use Modules\ProjectManagment\Http\Controllers\StageController;
 
 Route::middleware(['auth:api'])->prefix('v1')->group(function () {
     Route::get('projects/{project}/board', [BoardController::class, 'show'])->name('projects.board.show');
+    Route::get('projects/{project}/kanban', [BoardController::class, 'kanban'])->name('projects.kanban.show');
+    Route::get('projects/{project}/sheet', [BoardController::class, 'sheet'])->name('projects.sheet.show');
+    Route::get('projects/{project}/calendar', [BoardController::class, 'calendar'])->name('projects.calendar.show');
 
     Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');

@@ -50,3 +50,23 @@ After the project is created, the user gets a **Form** tab to build the project'
 After the project and form are set up, the user gets a modal to add **stages** — the pipeline columns a lead moves through (e.g. `todo`, `in progress`, etc.). The user chooses each stage's name freely.
 - On project creation a default stage named **`drafted`** is created automatically.
 - Stages belong to the project and are ordered (`sort_order`).
+
+
+## Update 1 -> How the system of the project really work 
+The project is the main core of the project where every thing connected to it so basically we have as we said before project contain form contain leads each leads has its own form answers at this point every thing is cool what we need to add 
+
+1) Project mode 
+
+the project have 3 modes
+- Sheet Mode
+- Kanban Mode
+- Calender Mode 
+
+# Sheet Mode 
+as we said the lead contain its answer of the form but i want the user to show the leads in form google sheets where you will add the label of the form in the header and the table under it will be the answer of each lead like google sheet
+
+# Kanban Mode 
+as we said before each lead contain its answer of the form and each form contain default Field which we will use it as title so i want in kanban to only show the title and due date of the lead and when the user click on the lead a sidenav bar will appear to show the title due date form answers 
+
+# Calender Mode 
+each lead contain by default Due Date value so on click on this mode we will get something like google calender that will show the lead on weekly base where the user will choose the target week and the lead will appear based on that 

@@ -5,13 +5,6 @@ This project is an **API** (Laravel backend, JSON responses, no Blade views). Al
 <laravel-boost-guidelines>
 === foundation rules ===
 
-# Instruction to follow 
-Before make any thing you have to populate your context using 
-- instructions/authentication.md
-- instructions/how-to-code.md
-
-Any code you write MUST follow `instructions/how-to-code.md`. The CRUD flows (listing, read, update, delete) defined there are mandatory — Controller → Service → Repository → Model layering, scopeFilter for listing, and FormRequest validation on every endpoint.
-
 # Laravel Boost Guidelines
 
 The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to ensure the best experience when building Laravel applications.
@@ -120,6 +113,13 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
 
+=== tests rules ===
+
+# Test Enforcement
+
+- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
+
 === laravel/core rules ===
 
 # Do Things the Laravel Way
@@ -165,6 +165,5 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - The `{name}` argument should not include the test suite directory. Use `php artisan make:test --pest SomeFeatureTest` instead of `php artisan make:test --pest Feature/SomeFeatureTest`.
 - Run tests: `php artisan test --compact` or filter: `php artisan test --compact --filter=testName`.
 - Do NOT delete tests without approval.
-
 
 </laravel-boost-guidelines>
