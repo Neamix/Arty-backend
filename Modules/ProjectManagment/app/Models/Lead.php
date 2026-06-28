@@ -30,16 +30,23 @@ class Lead extends Model
 
     public function scopeFilter(Builder $query, array $filters): Builder
     {
+        if (isset($filters['project_id'])) {
+            $query
+                ->select('leads.*')
+                ->join('stages', 'stages.id', '=', 'leads.stage_id')
+                ->where('stages.project_id', $filters['project_id']);
+        }
+
         if (isset($filters['stage_id'])) {
-            $query->where('stage_id', $filters['stage_id']);
+            $query->where('leads.stage_id', $filters['stage_id']);
         }
 
         if (isset($filters['due_from'])) {
-            $query->where('due_date', '>=', $filters['due_from']);
+            $query->where('leads.due_date', '>=', $filters['due_from']);
         }
 
         if (isset($filters['due_to'])) {
-            $query->where('due_date', '<=', $filters['due_to']);
+            $query->where('leads.due_date', '<=', $filters['due_to']);
         }
 
         if (! empty($filters['answers'])) {

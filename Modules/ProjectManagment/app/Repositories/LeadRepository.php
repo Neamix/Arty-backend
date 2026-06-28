@@ -3,7 +3,6 @@
 namespace Modules\ProjectManagment\Repositories;
 
 use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Support\Carbon;
 use Modules\ProjectManagment\Models\Lead;
 
 class LeadRepository
@@ -12,23 +11,15 @@ class LeadRepository
 
     public function filter(array $filters, int $perPage = 30): CursorPaginator
     {
-        return $this->lead->filter($filters)
+        $query = $this->lead->filter($filters)
             ->with('answers.field')
-            ->orderByDesc('leads.created_at')
-            ->orderByDesc('leads.id')
-            ->cursorPaginate($perPage);
-    }
+            ->when(
+                ($filters['sort'] ?? null) === 'due_date',
+                fn ($query) => $query->orderBy('leads.due_date')->orderBy('leads.id'),
+                fn ($query) => $query->orderByDesc('leads.created_at')->orderByDesc('leads.id'),
+            );
 
-    public function paginateForProject(int $projectId, int $perPage = 40): CursorPaginator
-    {
-        return $this->lead
-            ->select('leads.*')
-            ->join('stages', 'stages.id', '=', 'leads.stage_id')
-            ->where('stages.project_id', $projectId)
-            ->with('answers.field')
-            ->orderByDesc('leads.created_at')
-            ->orderByDesc('leads.id')
-            ->cursorPaginate($perPage);
+        return $query->cursorPaginate($perPage);
     }
 
     public function find(int $id): Lead
@@ -65,19 +56,6 @@ class LeadRepository
             ->groupBy('stage_id')
             ->pluck('aggregate', 'stage_id')
             ->all();
-    }
-
-    public function paginateDueForProjectWeek(int $projectId, Carbon $weekStart, Carbon $weekEnd, int $perPage = 40): CursorPaginator
-    {
-        return $this->lead
-            ->select('leads.*')
-            ->join('stages', 'stages.id', '=', 'leads.stage_id')
-            ->where('stages.project_id', $projectId)
-            ->whereBetween('leads.due_date', [$weekStart, $weekEnd])
-            ->with('answers.field')
-            ->orderBy('leads.due_date')
-            ->orderBy('leads.id')
-            ->cursorPaginate($perPage);
     }
 
     public function syncAnswers(Lead $lead, array $answers): void
