@@ -52,6 +52,6 @@ trait BelongsToWorkspace
             return null;
         }
 
-        return static::$workspaceIdCache[$userId] ??= Auth::user()->workspaces()->value('id');
+        return static::$workspaceIdCache[$userId] ??= Auth::user()->workspaces()->value('workspaces.id');
     }
 }

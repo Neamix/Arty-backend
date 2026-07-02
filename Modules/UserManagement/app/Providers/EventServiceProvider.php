@@ -4,7 +4,9 @@ namespace Modules\UserManagement\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Modules\UserManagement\Events\OtpRequested;
+use Modules\UserManagement\Events\WorkspaceInvitationCreated;
 use Modules\UserManagement\Listeners\SendOtpListener;
+use Modules\UserManagement\Listeners\SendWorkspaceInvitationListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         OtpRequested::class => [
             SendOtpListener::class,
+        ],
+        WorkspaceInvitationCreated::class => [
+            SendWorkspaceInvitationListener::class,
         ],
     ];
 

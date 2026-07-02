@@ -11,6 +11,7 @@ use Modules\ProjectManagment\Models\LeadAnswer;
 use Modules\ProjectManagment\Models\Project;
 use Modules\ProjectManagment\Models\Stage;
 use Modules\UserManagement\Models\Workspace;
+use Modules\UserManagement\Models\WorkspaceMember;
 
 uses(RefreshDatabase::class);
 
@@ -20,6 +21,13 @@ function actingProjectModeUserWithWorkspace(): array
     $workspace = Workspace::factory()->create(['owner_id' => $user->id]);
 
     test()->actingAs($user, 'api');
+
+    WorkspaceMember::create([
+        'workspace_id' => $workspace->id,
+        'user_id' => $user->id,
+        'role_id' => null,
+        'is_owner' => true,
+    ]);
 
     return [$user, $workspace];
 }

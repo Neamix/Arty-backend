@@ -17,7 +17,7 @@ class WorkspaceScope implements Scope
             return;
         }
 
-        $ids = static::$cache[Auth::id()] ??= Auth::user()->workspaces()->pluck('id')->all();
+        $ids = static::$cache[Auth::id()] ??= Auth::user()->workspaces()->pluck('workspaces.id')->all();
 
         $builder->whereIn($model->getTable().'.workspace_id', $ids);
     }

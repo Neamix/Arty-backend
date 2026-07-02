@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ProjectManagment\Models\Project;
 use Modules\UserManagement\Models\Workspace;
+use Modules\UserManagement\Models\WorkspaceMember;
 
 uses(RefreshDatabase::class);
 
@@ -13,6 +14,13 @@ function actingUserWithWorkspace(): array
     $workspace = Workspace::factory()->create(['owner_id' => $user->id]);
 
     test()->actingAs($user, 'api');
+
+    WorkspaceMember::create([
+        'workspace_id' => $workspace->id,
+        'user_id' => $user->id,
+        'role_id' => null,
+        'is_owner' => true,
+    ]);
 
     return [$user, $workspace];
 }

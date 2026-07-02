@@ -11,16 +11,21 @@ class WorkspaceRepository
 
     public function create(array $attributes): Workspace
     {
-        return $this->workspace->newQuery()->create($attributes);
+        return $this->workspace->create($attributes);
     }
 
     public function forOwner(int $ownerId): Collection
     {
-        return $this->workspace->newQuery()->where('owner_id', $ownerId)->get();
+        return $this->workspace->where('owner_id', $ownerId)->get();
+    }
+
+    public function find(int $id): Workspace
+    {
+        return $this->workspace->findOrFail($id);
     }
 
     public function slugExists(string $slug): bool
     {
-        return $this->workspace->newQuery()->where('slug', $slug)->exists();
+        return $this->workspace->where('slug', $slug)->exists();
     }
 }

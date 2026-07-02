@@ -1,0 +1,17 @@
+<?php
+
+namespace Modules\UserManagement\Events;
+
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use Modules\UserManagement\Models\WorkspaceInvitation;
+
+class WorkspaceInvitationCreated
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(
+        public WorkspaceInvitation $invitation,
+        public string $invitationUrl,
+    ) {}
+}
